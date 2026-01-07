@@ -1,10 +1,6 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # tasks file for tempo
-
-#https://github.com/grafana/tempo/releases/download/v2.9.0/tempo_2.9.0_linux_arm64.tar.gz
-#https://github.com/grafana/tempo/releases/download/v2.9.0/tempo_v2.9.0_linux_arm64.tar.gz
-
 - name: Host info
   debug:
     msg: "{{ item }}"
@@ -19,7 +15,6 @@
 
 - name: Defining download URL
   set_fact:
-    # https://github.com/grafana/tempo/releases/download/v2.9.0/tempo_2.9.0_linux_arm64.tar.gz
     tempo_download_url: "https://github.com/grafana/tempo/releases/download/v{{ tempo_version }}/tempo_{{ tempo_version }}_{{ ansible_facts['system'] | lower }}_{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else ansible_facts['architecture'] | lower }}.tar.gz"
 
 - name: Validating download URL

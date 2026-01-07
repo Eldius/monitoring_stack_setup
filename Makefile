@@ -17,6 +17,12 @@ install-tempo:
 uninstall-tempo:
 	ansible-playbook -i ./env/local/ uninstall-tempo.yml
 
+install-grafana:
+	ansible-playbook -i ./env/local/ install-grafana.yml
+
+uninstall-grafana:
+	ansible-playbook -i ./env/local/ uninstall-grafana.yml
+
 install-all:
 	ansible-playbook -i ./env/local/ install-all.yml
 

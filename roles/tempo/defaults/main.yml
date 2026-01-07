@@ -5,7 +5,7 @@ tempo_version: 2.9.0
 tempo_service_user: tempo
 tempo_service_group: tempo
 tempo_install_folder: "{{ base_install_folder }}/tempo"
-tempo_data_folder: "{{ base_data_folder }}/loki"
+tempo_data_folder: "{{ base_data_folder }}/tempo"
 tempo_config_folder: "{{ tempo_install_folder }}/config"
 tempo_http_listen_port: 3200
 tempo_grpc_listen_port: 9095

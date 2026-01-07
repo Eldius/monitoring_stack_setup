@@ -1,0 +1,60 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for grafana
+- name: Host info
+  debug:
+    msg: "{{ item }}"
+  with_items:
+    - "FQDN: {{ ansible_facts['fqdn'] }}"
+    - "ARCH: {{ ansible_facts['architecture'] }}"
+    - "OS: {{ ansible_facts['system'] }}"
+    - "Kernel: {{ ansible_facts['kernel'] }}"
+    - "OS Family: {{ ansible_facts['os_family'] }}"
+    - "Dist: {{ ansible_facts['distribution'] }}"
+    - "Dist Version: {{ ansible_facts['distribution_version'] }}"
+
+- name: Defining download URL
+  set_fact:
+    # https://dl.grafana.com/grafana/release/12.3.1/grafana_12.3.1_20271043721_linux_amd64.tar.gz
+    grafana_download_url: "https://dl.grafana.com/grafana/release/{{ grafana_version }}/grafana_{{ grafana_version }}_20271043721_{{ ansible_facts['system'] | lower }}_{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else ansible_facts['architecture'] | lower }}.tar.gz"
+
+- name: Validating download URL
+  debug:
+    msg: "grafana_download_url: {{ grafana_download_url }}"
+
+- name: Creating service group
+  group:
+    name: "{{ grafana_service_group }}"
+    state: present
+  become: true
+
+- name: Creating service user
+  user:
+    name: "{{ grafana_service_user }}"
+    state: present
+  become: true
+
+- name: Preparing folders
+  file:
+    name: "{{ item }}"
+    state: directory
+    owner: "{{ grafana_service_user }}"
+    group: "{{ grafana_service_group }}"
+    mode: '0755'
+  become: true
+  with_items: 
+    - "{{ grafana_install_folder }}"
+    - "{{ grafana_config_folder }}"
+    - "{{ grafana_data_folder }}"
+
+- name: Download and extract Grafana binary
+  ansible.builtin.unarchive:
+    src: "{{ grafana_download_url }}"
+    dest: "{{ grafana_install_folder }}"
+    owner: "{{ grafana_service_user }}"
+    group: "{{ grafana_service_group }}"
+    mode: '0755'
+    remote_src: yes
+    extra_opts:
+      - '--strip-components=1'
+  become: true

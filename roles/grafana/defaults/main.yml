@@ -1,0 +1,9 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for grafana
+grafana_version: 12.3.1
+grafana_service_user: grafana
+grafana_service_group: grafana
+grafana_install_folder: "{{ base_install_folder }}/grafana"
+grafana_data_folder: "{{ base_data_folder }}/grafana"
+grafana_config_folder: "{{ grafana_install_folder }}/conf"

@@ -2,6 +2,10 @@
 - name: Uninstall Loki
   hosts: monitoring
   tasks:
+    - name: Include Grafana uninstallation tasks
+      include_role:
+        name: grafana
+        tasks_from: uninstall.yml
     - name: Include Loki uninstallation tasks
       include_role:
         name: loki
