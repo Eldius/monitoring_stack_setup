@@ -1,0 +1,18 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for mimir
+
+mimir_install_folder: /usr/local/monitoring/mimir
+mimir_config_folder: /usr/local/monitoring/mimir/config
+mimir_data_folder: /var/lib/monitoring/mimir
+mimir_service_group: mimir
+mimir_service_user: mimir
+
+mimir_http_port: 9009
+mimir_grpc_port: 9095
+mimir_log_level: info
+mimir_storage_bucket_store_dir: "{{ mimir_data_folder }}/tsdb-sync"
+mimir_storage_filesystem_dir: "{{ mimir_data_folder }}/fs/tsdb"
+mimir_storage_tsdb_dir: "{{ mimir_data_folder }}/tmp/tsdb"
+mimir_compactor_data_dir: "{{ mimir_data_folder }}/tmp/compactor"
+mimir_ruler_storage_dir: "{{ mimir_data_folder }}/tmp/rules"

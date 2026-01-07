@@ -1,0 +1,96 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for mimir
+- name: Host info
+  debug:
+    msg: "{{ item }}"
+  with_items:
+    - "FQDN: {{ ansible_facts['fqdn'] }}"
+    - "ARCH: {{ ansible_facts['architecture'] }}"
+    - "OS: {{ ansible_facts['system'] }}"
+    - "Kernel: {{ ansible_facts['kernel'] }}"
+    - "OS Family: {{ ansible_facts['os_family'] }}"
+    - "Dist: {{ ansible_facts['distribution'] }}"
+    - "Dist Version: {{ ansible_facts['distribution_version'] }}"
+
+- name: Defining download URL
+  set_fact:
+    mimir_download_url: "https://github.com/grafana/mimir/releases/latest/download/mimir-{{ ansible_facts['system'] | lower }}-{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else ansible_facts['architecture'] | lower }}"
+
+- name: Creating service group
+  group:
+    name: "{{ mimir_service_group }}"
+    state: present
+  become: true
+
+- name: Creating service user
+  user:
+    name: "{{ mimir_service_user }}"
+    state: present
+  become: true
+
+- name: Preparing folders
+  file:
+    name: "{{ item }}"
+    state: directory
+    owner: "{{ mimir_service_user }}"
+    group: "{{ mimir_service_group }}"
+    mode: '0755'
+  become: true
+  with_items: 
+    - "{{ mimir_install_folder }}"
+    - "{{ mimir_config_folder }}"
+    - "{{ mimir_data_folder }}"
+    - "{{ mimir_storage_bucket_store_dir }}"
+    - "{{ mimir_storage_filesystem_dir }}"
+    - "{{ mimir_storage_tsdb_dir }}"
+    - "{{ mimir_compactor_data_dir }}"
+    - "{{ mimir_ruler_storage_dir }}"
+
+
+
+- name: Downloading Mimir binary
+  get_url:
+    url: "{{ mimir_download_url }}"
+    dest: "{{ mimir_install_folder }}/mimir"
+    mode: '0755'
+    owner: "{{ mimir_service_user }}"
+    group: "{{ mimir_service_group }}"
+  become: true
+
+- name: Creating default config file
+  template:
+    src: mimir-config.yml.j2
+    dest: "{{ mimir_config_folder }}/mimir-config.yaml"
+    owner: "{{ mimir_service_user }}"
+    group: "{{ mimir_service_group }}"
+    mode: '0644'
+  become: true
+
+- name: Creating systemd service file
+  template:
+    src: mimir.service.j2
+    dest: /etc/systemd/system/mimir.service
+    mode: '0644'
+  become: true
+
+- name: Reloading systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: true
+
+- name: Enabling and starting Mimir service
+  systemd:
+    name: mimir
+    enabled: yes
+    state: started
+  become: true
+
+- name: Checking Mimir service status
+  systemd:
+    name: mimir
+  register: mimir_service_status
+  become: true
+
+- debug:
+    msg: "Mimir service is {{ 'running' if mimir_service_status.status.ActiveState == 'active' else 'not running' }}"

@@ -1,0 +1,5 @@
+---
+- name: Deploy Monitoring Stack Natively (Prometheus, Loki, Mimir, Grafana)
+  hosts: monitoring
+  roles:
+    - mimir

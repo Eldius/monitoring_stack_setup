@@ -1,0 +1,47 @@
+---
+# templates/mimir-config.yml.j2
+# Run Mimir in monolithic mode
+# Do not use this configuration in production.
+# It is for demonstration purposes only.
+multitenancy_enabled: false
+
+blocks_storage:
+  backend: filesystem
+  bucket_store:
+    sync_dir: {{ mimir_storage_bucket_store_dir }}
+  filesystem:
+    dir: {{ mimir_storage_filesystem_dir }}
+  tsdb:
+    dir: {{ mimir_storage_tsdb_dir }}
+
+compactor:
+  data_dir: {{ mimir_compactor_data_dir }}
+  sharding_ring:
+    kvstore:
+      store: memberlist
+
+distributor:
+  ring:
+    instance_addr: 0.0.0.0
+    kvstore:
+      store: memberlist
+
+ingester:
+  ring:
+    instance_addr: 0.0.0.0
+    kvstore:
+      store: memberlist
+    replication_factor: 1
+
+ruler_storage:
+  backend: filesystem
+  filesystem:
+    dir: {{ mimir_ruler_storage_dir }}
+
+server:
+  http_listen_port: {{ mimir_http_port }}
+  log_level: {{ mimir_log_level }}
+
+store_gateway:
+  sharding_ring:
+    replication_factor: 1

@@ -1,0 +1,32 @@
+[Unit]
+Description=Mimir is a scalable, long-term storage for Prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User={{ mimir_service_user }}
+Group={{ mimir_service_group }}
+Type=simple
+WorkingDirectory={{ mimir_data_folder }}
+
+ExecStart={{ mimir_install_folder }}/mimir \
+    -target=all \
+    -config.file={{ mimir_config_folder }}/mimir-config.yaml
+
+SyslogIdentifier=mimir
+Restart=always
+RestartSec=5 # Give Mimir a bit more time between restarts
+StartLimitIntervalSec=0 # Allow unlimited restarts if needed initially
+
+# Security Hardening
+ProtectSystem=full
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+#RestrictAddressFamilies=AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

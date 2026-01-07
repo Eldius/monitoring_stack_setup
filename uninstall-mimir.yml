@@ -1,0 +1,8 @@
+---
+- name: Deploy Monitoring Stack Natively (Prometheus, Loki, Mimir, Grafana)
+  hosts: monitoring
+  tasks:
+    - name: Include Mimir uninstallation tasks
+      include_role:
+        name: mimir
+        tasks_from: uninstall.yml
