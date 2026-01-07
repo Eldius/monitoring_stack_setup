@@ -2,9 +2,11 @@
 ---
 # defaults file for mimir
 
-mimir_install_folder: /usr/local/monitoring/mimir
+base_install_folder: /usr/local/monitoring
+mimir_install_folder: "{{ base_install_folder }}/mimir"
 mimir_config_folder: /usr/local/monitoring/mimir/config
-mimir_data_folder: /var/lib/monitoring/mimir
+base_data_folder: /var/lib/monitoring
+mimir_data_folder: "{{ base_data_folder }}/mimir"
 mimir_service_group: mimir
 mimir_service_user: mimir
 

@@ -1,0 +1,17 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for loki
+base_install_folder: /usr/local/monitoring
+loki_install_folder: "{{ base_install_folder }}/loki"
+base_data_folder: /var/lib/monitoring
+loki_data_folder: "{{ base_data_folder }}/loki"
+loki_config_folder: "{{ loki_install_folder }}/config"
+loki_service_group: loki
+loki_service_user: loki
+loki_log_level: info
+loki_common_path_prefix: "{{ loki_data_folder }}/tmp/loki/common"
+loki_common_storage_chunks_directory: "{{ loki_data_folder }}/tmp/loki/chunks"
+loki_storage_config_directory: "{{ loki_data_folder }}/tmp/loki/chunks"
+loki_rules_storage_directory: "{{ loki_data_folder }}/tmp/loki/rules"
+loki_http_listen_port: 3100
+loki_grpc_listen_port: 9096

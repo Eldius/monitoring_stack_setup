@@ -1,0 +1,105 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for loki
+#wget https://dl.grafana.com/grafana-enterprise/release/12.3.1/grafana-enterprise_12.3.1_20271043721_linux_amd64.tar.gz
+#tar -zxvf grafana-enterprise_12.3.1_20271043721_linux_amd64.tar.gz
+
+- name: Host info
+  debug:
+    msg: "{{ item }}"
+  with_items:
+    - "FQDN: {{ ansible_facts['fqdn'] }}"
+    - "ARCH: {{ ansible_facts['architecture'] }}"
+    - "OS: {{ ansible_facts['system'] }}"
+    - "Kernel: {{ ansible_facts['kernel'] }}"
+    - "OS Family: {{ ansible_facts['os_family'] }}"
+    - "Dist: {{ ansible_facts['distribution'] }}"
+    - "Dist Version: {{ ansible_facts['distribution_version'] }}"
+
+- name: Defining download URL
+  set_fact:
+    loki_download_url: "https://github.com/grafana/loki/releases/download/v3.6.3/loki-{{ ansible_facts['system'] | lower }}-{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else ansible_facts['architecture'] | lower }}.zip"
+- name: Creating service group
+  group:
+    name: "{{ loki_service_group }}"
+    state: present
+  become: true
+- name: Creating service user
+  user:
+    name: "{{ loki_service_user }}"
+    state: present
+  become: true
+
+- name: Preparing base folder
+  file:
+    name: "{{ base_install_folder }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Preparing folders
+  file:
+    name: "{{ item }}"
+    state: directory
+    owner: "{{ loki_service_user }}"
+    group: "{{ loki_service_group }}"
+    mode: '0755'
+  become: true
+  with_items: 
+    - "{{ loki_install_folder }}"
+    - "{{ loki_config_folder }}"
+    - "{{ loki_data_folder }}"
+    - "{{ loki_common_path_prefix }}"
+    - "{{ loki_storage_config_directory }}"
+    - "{{ loki_rules_storage_directory }}"
+
+- name: Configuring Loki
+  template:
+    src: loki.yaml.j2
+    dest: "{{ loki_config_folder }}/loki.yaml"
+    owner: "{{ loki_service_user }}"
+    group: "{{ loki_service_group }}"
+    mode: '0755'
+  become: true
+
+- name: Download and extract Loki binary
+  ansible.builtin.unarchive:
+    src: "{{ loki_download_url }}"
+    dest: "{{ loki_install_folder }}"
+    owner: "{{ loki_service_user }}"
+    group: "{{ loki_service_group }}"
+    mode: '0755'
+    remote_src: yes
+  become: true
+
+- name: Creating systemd service file
+  template:
+    src: loki.service.j2
+    dest: /etc/systemd/system/loki.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Reloading systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: true
+
+- name: Enabling and starting Loki service
+  systemd:
+    name: loki
+    enabled: yes
+    state: started 
+  become: true
+
+- name: Checking Loki service status
+  systemd:
+    name: loki
+  register: loki_service_status
+  become: true
+
+- debug:
+    msg: "Mimir service is {{ 'running' if loki_service_status.status.ActiveState == 'active' else 'not running' }}"

@@ -1,0 +1,33 @@
+[Unit]
+Description=Loki log aggregation system
+After=network.target
+
+[Service]
+Type=simple
+User=loki
+Group=loki
+
+ExecStart={{ loki_install_folder }}/loki-{{ ansible_facts['system'] | lower }}-{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else ansible_facts['architecture'] | lower }} \
+    -target=all \
+    --config.file={{ loki_config_folder }}/loki.yaml
+
+SyslogIdentifier=loki
+Restart=always
+RestartSec=5 # Give Mimir a bit more time between restarts
+StartLimitIntervalSec=0 # Allow unlimited restarts if needed initially
+
+# Security Hardening
+ProtectSystem=full
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+#RestrictAddressFamilies=AF_INET AF_INET6
+# Optional: adjust resource accounting or sandboxing if needed
+# CPUAccounting=True
+# MemoryAccounting=True
+
+[Install]
+WantedBy=multi-user.target

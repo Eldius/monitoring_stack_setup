@@ -1,6 +1,6 @@
 #SPDX-License-Identifier: MIT-0
 ---
-# tasks file for mimir
+# tasks file for loki
 - name: Host info
   debug:
     msg: "{{ item }}"
@@ -13,16 +13,16 @@
     - "Dist: {{ ansible_facts['distribution'] }}"
     - "Dist Version: {{ ansible_facts['distribution_version'] }}"
 
-- name: Disabling and stopping Mimir service
+- name: Disabling and stopping Loki service
   systemd:
-    name: mimir
+    name: loki
     enabled: no
     state: stopped
   become: true
 
 - name: Removing systemd service file
   file:
-    name: /etc/systemd/system/mimir.service
+    name: /etc/systemd/system/loki.service
     state: absent
   become: true
 
@@ -33,13 +33,13 @@
 
 - name: Removing service user
   user:
-    name: "{{ mimir_service_user }}"
+    name: "{{ loki_service_user }}"
     state: absent
   become: true
 
 - name: Removing service group
   group:
-    name: "{{ mimir_service_group }}"
+    name: "{{ loki_service_group }}"
     state: absent
   become: true
 
@@ -49,6 +49,9 @@
     state: absent
   become: true
   with_items: 
-    - "{{ mimir_install_folder }}"
-    - "{{ mimir_config_folder }}"
-    - "{{ mimir_data_folder }}"
+    - "{{ loki_install_folder }}"
+    - "{{ loki_config_folder }}"
+    - "{{ loki_data_folder }}"
+    - "{{ loki_common_path_prefix }}"
+    - "{{ loki_storage_config_directory }}"
+    - "{{ loki_rules_storage_directory }}"

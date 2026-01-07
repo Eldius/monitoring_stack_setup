@@ -1,0 +1,8 @@
+---
+- name: Uninstall Loki
+  hosts: monitoring
+  tasks:
+    - name: Include Loki uninstallation tasks
+      include_role:
+        name: loki
+        tasks_from: uninstall.yml

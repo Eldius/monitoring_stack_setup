@@ -1,0 +1,3 @@
+---
+base_install_folder: /usr/local/monitoring
+base_data_folder: /var/lib/monitoring
