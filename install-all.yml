@@ -1,0 +1,8 @@
+---
+- name: Deploy Loki
+  hosts: monitoring
+  roles:
+    - base
+    - mimir
+    - loki
+    - tempo

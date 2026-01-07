@@ -1,0 +1,20 @@
+---
+- name: Uninstall Loki
+  hosts: monitoring
+  tasks:
+    - name: Include Loki uninstallation tasks
+      include_role:
+        name: loki
+        tasks_from: uninstall.yml
+    - name: Include Tempo uninstallation tasks
+      include_role:
+        name: tempo
+        tasks_from: uninstall.yml
+    - name: Include Mimir uninstallation tasks
+      include_role:
+        name: mimir
+        tasks_from: uninstall.yml
+    - name: Include base uninstallation tasks
+      include_role:
+        name: base
+        tasks_from: uninstall.yml

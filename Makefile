@@ -10,3 +10,15 @@ install-loki:
 
 uninstall-loki:
 	ansible-playbook -i ./env/local/ uninstall-loki.yml
+
+install-tempo:
+	ansible-playbook -i ./env/local/ install-tempo.yml
+
+uninstall-tempo:
+	ansible-playbook -i ./env/local/ uninstall-tempo.yml
+
+install-all:
+	ansible-playbook -i ./env/local/ install-all.yml
+
+uninstall-all:
+	ansible-playbook -i ./env/local/ uninstall-all.yml

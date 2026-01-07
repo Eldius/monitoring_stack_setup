@@ -1,0 +1,8 @@
+---
+- name: Uninstall Tempo
+  hosts: monitoring
+  tasks:
+    - name: Include Tempo uninstallation tasks
+      include_role:
+        name: tempo
+        tasks_from: uninstall.yml

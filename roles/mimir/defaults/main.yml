@@ -11,7 +11,7 @@ mimir_service_group: mimir
 mimir_service_user: mimir
 
 mimir_http_port: 9009
-mimir_grpc_port: 9095
+mimir_grpc_port: 9005
 mimir_log_level: info
 mimir_storage_bucket_store_dir: "{{ mimir_data_folder }}/tsdb-sync"
 mimir_storage_filesystem_dir: "{{ mimir_data_folder }}/fs/tsdb"

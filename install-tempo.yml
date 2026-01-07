@@ -1,0 +1,6 @@
+---
+- name: Deploy Tempo
+  hosts: monitoring
+  roles:
+    - base
+    - tempo

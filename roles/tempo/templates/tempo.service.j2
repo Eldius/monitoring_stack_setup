@@ -1,0 +1,33 @@
+[Unit]
+Description=Tempo distributed tracing system
+After=network.target
+
+[Service]
+Type=simple
+User=tempo
+Group=tempo
+
+ExecStart={{ tempo_install_folder }}/tempo \
+    -target=all \
+    --config.file={{ tempo_config_folder }}/tempo.yaml
+
+SyslogIdentifier=tempo
+Restart=always
+RestartSec=5
+StartLimitIntervalSec=0
+
+# Security Hardening
+ProtectSystem=full
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+#RestrictAddressFamilies=AF_INET AF_INET6
+# Optional: adjust resource accounting or sandboxing if needed
+# CPUAccounting=True
+# MemoryAccounting=True
+
+[Install]
+WantedBy=multi-user.target

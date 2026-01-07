@@ -30,15 +30,6 @@
     state: present
   become: true
 
-- name: Preparing base folder
-  file:
-    name: "{{ base_install_folder }}"
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-  become: true
-
 - name: Preparing folders
   file:
     name: "{{ item }}"
@@ -102,4 +93,4 @@
   become: true
 
 - debug:
-    msg: "Mimir service is {{ 'running' if loki_service_status.status.ActiveState == 'active' else 'not running' }}"
+    msg: "Loki service is {{ 'running' if loki_service_status.status.ActiveState == 'active' else 'not running' }}"
