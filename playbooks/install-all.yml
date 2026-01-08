@@ -6,5 +6,6 @@
     - eldius.monitoring_stack_setup.mimir
     - eldius.monitoring_stack_setup.loki
     - eldius.monitoring_stack_setup.tempo
-    - eldius.monitoring_stack_setup.grafana
     - eldius.monitoring_stack_setup.prometheus
+    - eldius.monitoring_stack_setup.grafana
+    - eldius.monitoring_stack_setup.alloy

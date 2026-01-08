@@ -1,0 +1,8 @@
+---
+- name: Uninstall Alloy
+  hosts: monitoring
+  tasks:
+    - name: Include Alloy uninstallation tasks
+      include_role:
+        name: eldius.monitoring_stack_setup.alloy
+        tasks_from: uninstall.yml

@@ -1,0 +1,97 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for alloy
+- name: Host info
+  debug:
+    msg: "{{ item }}"
+  with_items:
+    - "FQDN: {{ ansible_facts['fqdn'] }}"
+    - "ARCH: {{ ansible_facts['architecture'] }}"
+    - "OS: {{ ansible_facts['system'] }}"
+    - "Kernel: {{ ansible_facts['kernel'] }}"
+    - "OS Family: {{ ansible_facts['os_family'] }}"
+    - "Dist: {{ ansible_facts['distribution'] }}"
+    - "Dist Version: {{ ansible_facts['distribution_version'] }}"
+
+- name: Defining download URL
+  set_fact:
+    # https://github.com/grafana/alloy/releases/download/v1.12.1/alloy-linux-arm64.zip
+    alloy_download_url: "https://github.com/grafana/alloy/releases/download/v{{ alloy_version }}/alloy-{{ ansible_facts['system'] | lower }}-{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else ansible_facts['architecture'] | lower }}.zip"
+
+- name: Validating download URL
+  debug:
+    msg: "alloy_download_url: {{ alloy_download_url }}"
+
+- name: Creating service group
+  group:
+    name: "{{ alloy_service_group }}"
+    state: present
+  become: true
+
+- name: Creating service user
+  user:
+    name: "{{ alloy_service_user }}"
+    state: present
+  become: true
+
+- name: Preparing folders
+  file:
+    name: "{{ item }}"
+    state: directory
+    owner: "{{ alloy_service_user }}"
+    group: "{{ alloy_service_group }}"
+    mode: '0755'
+  become: true
+  with_items: 
+    - "{{ alloy_install_folder }}"
+    - "{{ alloy_config_folder }}"
+    - "{{ alloy_data_folder }}"
+
+- name: Download and extract Alloy binary
+  ansible.builtin.unarchive:
+    src: "{{ alloy_download_url }}"
+    dest: "{{ alloy_install_folder }}"
+    owner: "{{ alloy_service_user }}"
+    group: "{{ alloy_service_group }}"
+    mode: '0755'
+    remote_src: yes
+  become: true
+
+- name: Configuring Alloy
+  template:
+    src: config.alloy.j2
+    dest: "{{ alloy_config_folder }}/config.alloy"
+    owner: "{{ alloy_service_user }}"
+    group: "{{ alloy_service_group }}"
+    mode: '0755'
+  become: true
+
+- name: Creating systemd service file
+  template:
+    src: alloy.service.j2
+    dest: /etc/systemd/system/alloy.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Reloading systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: true
+
+- name: Enabling and starting Alloy service
+  systemd:
+    name: alloy
+    enabled: yes
+    state: started 
+  become: true
+
+- name: Checking Alloy service status
+  systemd:
+    name: alloy
+  register: alloy_service_status
+  become: true
+
+- debug:
+    msg: "Alloy service is {{ 'running' if alloy_service_status.status.ActiveState == 'active' else 'not running' }}"

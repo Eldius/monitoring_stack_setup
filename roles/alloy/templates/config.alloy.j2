@@ -1,0 +1,67 @@
+// --- LOGS: Systemd Journal ---
+// Scrapes the local Linux systemd journal for host logs
+loki.source.journal "local_systemd" {
+  forward_to = [loki.write.backend_loki.receiver]
+  labels     = { 
+    job      = "systemd-journal",
+    instance = "${HOSTNAME}", // Usually replaced by an environment variable or discovery
+  }
+}
+
+loki.write "backend_loki" {
+  endpoint {
+    url = "http://localhost:3100/loki/api/v1/push"
+    // tenant_id = "tenant-a" // Uncomment if using multi-tenancy
+  }
+}
+
+// --- OTLP RECEIVER (Metrics & Traces) ---
+// Accepts OTLP data from applications running on this host
+otelcol.receiver.otlp "otlp_ingest" {
+  grpc {
+    endpoint = "0.0.0.0:{{ alloy_otlp_grpc_ingest_port }}"
+  }
+  http {
+    endpoint = "0.0.0.0:{{ alloy_otlp_http_ingest_port }}"
+  }
+
+  output {
+    metrics = [otelcol.exporter.prometheus.to_prometheus.input]
+    traces  = [otelcol.exporter.otlp.to_tempo.input]
+    logs = [otelcol.processor.batch.default.input]
+  }
+}
+
+// --- METRICS: OTLP to Prometheus ---
+// Converts OTLP metrics to Prometheus format
+otelcol.exporter.prometheus "to_prometheus" {
+  forward_to = [prometheus.remote_write.backend_prometheus.receiver]
+}
+
+prometheus.remote_write "backend_prometheus" {
+  endpoint {
+    url = "http://localhost:9090/api/v1/write"
+  }
+}
+
+// --- TRACES: OTLP to Tempo ---
+// Forwards spans to Tempo using the OTLP protocol
+otelcol.exporter.otlp "to_tempo" {
+  client {
+    endpoint = "localhost:4317"
+    tls {
+      insecure = true // Set to false if using SSL/TLS
+    }
+  }
+}
+
+// Finally, export to Loki
+otelcol.exporter.loki "default" {
+  forward_to = [loki.write.backend_loki.receiver]
+}
+
+otelcol.processor.batch "default" {
+  output {
+    logs = [otelcol.exporter.loki.default.input]
+  }
+}

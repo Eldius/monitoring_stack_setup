@@ -1,0 +1,15 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for alloy
+alloy_version: 1.12.1
+alloy_install_folder: "{{ base_install_folder }}/alloy"
+alloy_data_folder: "{{ base_data_folder }}/alloy"
+alloy_config_folder: "{{ alloy_install_folder }}/config"
+
+
+alloy_otlp_grpc_ingest_port: 4317
+alloy_otlp_http_ingest_port: 4318
+alloy_http_listen_port: 12345
+
+alloy_service_group: alloy
+alloy_service_user: alloy

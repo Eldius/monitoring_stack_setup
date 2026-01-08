@@ -32,6 +32,12 @@ install-prometheus:
 uninstall-prometheus:
 	ansible-playbook -i ./env/local/ playbooks/uninstall-prometheus.yml
 
+install-alloy:
+	ansible-playbook -i ./env/local/ playbooks/install-alloy.yml
+
+uninstall-alloy:
+	ansible-playbook -i ./env/local/ playbooks/uninstall-alloy.yml
+
 install-all:
 	ansible-playbook -i ./env/local/ playbooks/install-all.yml
 

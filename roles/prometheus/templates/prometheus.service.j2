@@ -1,0 +1,25 @@
+[Unit]
+Description=Prometheus (Remote-Write Mode)
+Documentation=https://prometheus.io/docs/introduction/overview/
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+
+# --config.file points to your custom path
+# --storage.tsdb.retention.time=2h keeps local storage minimal since Mimir is the source of truth
+# --web.enable-lifecycle allows reloading via HTTP POST
+ExecStart={{ prometheus_install_folder }}/prometheus \
+  --config.file={{ prometheus_install_folder }}/prometheus.yml
+
+# Tells Prometheus to reload config without restarting the process
+ExecReload=/bin/kill -HUP $MAINPID
+
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,54 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for Grafana
+- name: Host info
+  debug:
+    msg: "{{ item }}"
+  with_items:
+    - "FQDN: {{ ansible_facts['fqdn'] }}"
+    - "ARCH: {{ ansible_facts['architecture'] }}"
+    - "OS: {{ ansible_facts['system'] }}"
+    - "Kernel: {{ ansible_facts['kernel'] }}"
+    - "OS Family: {{ ansible_facts['os_family'] }}"
+    - "Dist: {{ ansible_facts['distribution'] }}"
+    - "Dist Version: {{ ansible_facts['distribution_version'] }}"
+
+- name: Disabling and stopping Grafana service
+  systemd:
+    name: alloy
+    enabled: no
+    state: stopped
+  become: true
+
+- name: Removing systemd service file
+  file:
+    name: /etc/systemd/system/alloy.service
+    state: absent
+  become: true
+
+- name: Reloading systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: true
+
+- name: Removing service user
+  user:
+    name: "{{ alloy_service_user }}"
+    state: absent
+  become: true
+
+- name: Removing service group
+  group:
+    name: "{{ alloy_service_group }}"
+    state: absent
+  become: true
+
+- name: Removing folders
+  file:
+    name: "{{ item }}"
+    state: absent
+  become: true
+  with_items: 
+    - "{{ alloy_install_folder }}"
+    - "{{ alloy_config_folder }}"
+    - "{{ alloy_data_folder }}"

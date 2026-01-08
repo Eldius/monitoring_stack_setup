@@ -66,15 +66,15 @@
     mode: '0755'
   become: true
 
-#- name: Creating systemd service file
-#  template:
-#    src: prometheus.service.j2
-#    dest: /etc/systemd/system/prometheus.service
-#    owner: root
-#    group: root
-#    mode: '0644'
-#  become: true
-#
+- name: Creating systemd service file
+  template:
+    src: prometheus.service.j2
+    dest: /etc/systemd/system/prometheus.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
 #- name: Reloading systemd daemon
 #  systemd:
 #    daemon_reload: yes
