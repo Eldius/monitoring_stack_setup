@@ -15,7 +15,6 @@
 
 - name: Defining download URL
   set_fact:
-    # https://dl.grafana.com/grafana/release/12.3.1/grafana_12.3.1_20271043721_linux_amd64.tar.gz
     grafana_download_url: "https://dl.grafana.com/grafana/release/{{ grafana_version }}/grafana_{{ grafana_version }}_20271043721_{{ ansible_facts['system'] | lower }}_{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else ansible_facts['architecture'] | lower }}.tar.gz"
 
 - name: Validating download URL
@@ -58,3 +57,42 @@
     extra_opts:
       - '--strip-components=1'
   become: true
+
+- name: Configuring Tempo
+  template:
+    src: grafana.ini.j2
+    dest: "{{ grafana_config_folder }}/grafana.ini"
+    owner: "{{ grafana_service_user }}"
+    group: "{{ grafana_service_group }}"
+    mode: '0755'
+  become: true
+
+- name: Creating systemd service file
+  template:
+    src: grafana.service.j2
+    dest: /etc/systemd/system/grafana.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Reloading systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: true
+
+- name: Enabling and starting Grafana service
+  systemd:
+    name: grafana
+    enabled: yes
+    state: started 
+  become: true
+
+- name: Checking Grafana service status
+  systemd:
+    name: grafana
+  register: grafana_service_status
+  become: true
+
+- debug:
+    msg: "Grafana service is {{ 'running' if grafana_service_status.status.ActiveState == 'active' else 'not running' }}"

@@ -1,0 +1,42 @@
+[Unit]
+Description=Grafana Dashboards system
+After=network.target
+
+[Service]
+Type=simple
+User=grafana
+Group=grafana
+
+WorkingDirectory={{ grafana_install_folder }}
+
+ExecStart={{ grafana_install_folder }}/bin/grafana server \
+    --config={{ grafana_config_folder }}/grafana.ini
+
+SyslogIdentifier=grafana
+Restart=always
+RestartSec=5
+StartLimitIntervalSec=0
+
+# Security Hardening
+ProtectSystem=full
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+#RestrictAddressFamilies=AF_INET AF_INET6
+# Optional: adjust resource accounting or sandboxing if needed
+# CPUAccounting=True
+# MemoryAccounting=True
+
+# Give the CAP_NET_BIND_SERVICE capability
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+# A private user cannot have process capabilities on the host's user
+# namespace and thus CAP_NET_BIND_SERVICE has no effect.
+PrivateUsers=false
+
+[Install]
+WantedBy=multi-user.target

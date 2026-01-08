@@ -7,3 +7,4 @@ grafana_service_group: grafana
 grafana_install_folder: "{{ base_install_folder }}/grafana"
 grafana_data_folder: "{{ base_data_folder }}/grafana"
 grafana_config_folder: "{{ grafana_install_folder }}/conf"
+grafana_logs_folder: "{{ base_data_folder }}/logs"
