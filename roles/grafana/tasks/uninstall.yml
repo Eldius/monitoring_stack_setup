@@ -13,23 +13,23 @@
     - "Dist: {{ ansible_facts['distribution'] }}"
     - "Dist Version: {{ ansible_facts['distribution_version'] }}"
 
-# - name: Disabling and stopping Grafana service
-#   systemd:
-#     name: grafana
-#     enabled: no
-#     state: stopped
-#   become: true
+- name: Disabling and stopping Grafana service
+  systemd:
+    name: grafana
+    enabled: no
+    state: stopped
+  become: true
 
-# - name: Removing systemd service file
-#   file:
-#     name: /etc/systemd/system/grafana.service
-#     state: absent
-#   become: true
+- name: Removing systemd service file
+  file:
+    name: /etc/systemd/system/grafana.service
+    state: absent
+  become: true
 
-# - name: Reloading systemd daemon
-#   systemd:
-#     daemon_reload: yes
-#   become: true
+- name: Reloading systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: true
 
 - name: Removing service user
   user:
