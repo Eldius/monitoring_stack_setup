@@ -1,6 +1,6 @@
 ---
-- name: Deploy Loki
+- name: Deploy Prometheus
   hosts: monitoring
   roles:
     - base
-    - grafana
+    - prometheus

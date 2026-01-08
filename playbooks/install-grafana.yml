@@ -1,0 +1,6 @@
+---
+- name: Deploy Loki
+  hosts: monitoring
+  roles:
+    - eldius.monitoring_stack_setup.base
+    - eldius.monitoring_stack_setup.grafana

@@ -1,0 +1,96 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for tempo
+- name: Host info
+  debug:
+    msg: "{{ item }}"
+  with_items:
+    - "FQDN: {{ ansible_facts['fqdn'] }}"
+    - "ARCH: {{ ansible_facts['architecture'] }}"
+    - "OS: {{ ansible_facts['system'] }}"
+    - "Kernel: {{ ansible_facts['kernel'] }}"
+    - "OS Family: {{ ansible_facts['os_family'] }}"
+    - "Dist: {{ ansible_facts['distribution'] }}"
+    - "Dist Version: {{ ansible_facts['distribution_version'] }}"
+
+- name: Defining download URL
+  set_fact:
+    tempo_download_url: "https://github.com/grafana/tempo/releases/download/v{{ tempo_version }}/tempo_{{ tempo_version }}_{{ ansible_facts['system'] | lower }}_{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else ansible_facts['architecture'] | lower }}.tar.gz"
+
+- name: Validating download URL
+  debug:
+    msg: "tempo_download_url: {{ tempo_download_url }}"
+
+- name: Creating service group
+  group:
+    name: "{{ tempo_service_group }}"
+    state: present
+  become: true
+
+- name: Creating service user
+  user:
+    name: "{{ tempo_service_user }}"
+    state: present
+  become: true
+
+- name: Preparing folders
+  file:
+    name: "{{ item }}"
+    state: directory
+    owner: "{{ tempo_service_user }}"
+    group: "{{ tempo_service_group }}"
+    mode: '0755'
+  become: true
+  with_items: 
+    - "{{ tempo_install_folder }}"
+    - "{{ tempo_config_folder }}"
+    - "{{ tempo_data_folder }}"
+
+- name: Download and extract Tempo binary
+  ansible.builtin.unarchive:
+    src: "{{ tempo_download_url }}"
+    dest: "{{ tempo_install_folder }}"
+    owner: "{{ tempo_service_user }}"
+    group: "{{ tempo_service_group }}"
+    mode: '0755'
+    remote_src: yes
+  become: true
+
+- name: Configuring Tempo
+  template:
+    src: tempo.yaml.j2
+    dest: "{{ tempo_config_folder }}/tempo.yaml"
+    owner: "{{ tempo_service_user }}"
+    group: "{{ tempo_service_group }}"
+    mode: '0755'
+  become: true
+
+- name: Creating systemd service file
+  template:
+    src: tempo.service.j2
+    dest: /etc/systemd/system/tempo.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Reloading systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: true
+
+- name: Enabling and starting Tempo service
+  systemd:
+    name: tempo
+    enabled: yes
+    state: started 
+  become: true
+
+- name: Checking Tempo service status
+  systemd:
+    name: tempo
+  register: tempo_service_status
+  become: true
+
+- debug:
+    msg: "Tempo service is {{ 'running' if tempo_service_status.status.ActiveState == 'active' else 'not running' }}"

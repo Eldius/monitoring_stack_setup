@@ -1,30 +1,30 @@
 
 install-mimir:
-	ansible-playbook -i ./env/local/ install-mimir.yml
+	ansible-playbook -i ./env/local/ playbooks/install-mimir.yml
 
 uninstall-mimir:
-	ansible-playbook -i ./env/local/ uninstall-mimir.yml
+	ansible-playbook -i ./env/local/ playbooks/uninstall-mimir.yml
 
 install-loki:
-	ansible-playbook -i ./env/local/ install-loki.yml
+	ansible-playbook -i ./env/local/ playbooks/install-loki.yml
 
 uninstall-loki:
-	ansible-playbook -i ./env/local/ uninstall-loki.yml
+	ansible-playbook -i ./env/local/ playbooks/uninstall-loki.yml
 
 install-tempo:
-	ansible-playbook -i ./env/local/ install-tempo.yml
+	ansible-playbook -i ./env/local/ playbooks/install-tempo.yml
 
 uninstall-tempo:
-	ansible-playbook -i ./env/local/ uninstall-tempo.yml
+	ansible-playbook -i ./env/local/ playbooks/uninstall-tempo.yml
 
 install-grafana:
-	ansible-playbook -i ./env/local/ install-grafana.yml
+	ansible-playbook -i ./env/local/ playbooks/install-grafana.yml
 
 uninstall-grafana:
-	ansible-playbook -i ./env/local/ uninstall-grafana.yml
+	ansible-playbook -i ./env/local/ playbooks/uninstall-grafana.yml
 
 install-all:
-	ansible-playbook -i ./env/local/ install-all.yml
+	ansible-playbook -i ./env/local/ playbooks/install-all.yml
 
 uninstall-all:
-	ansible-playbook -i ./env/local/ uninstall-all.yml
+	ansible-playbook -i ./env/local/ playbooks/uninstall-all.yml
