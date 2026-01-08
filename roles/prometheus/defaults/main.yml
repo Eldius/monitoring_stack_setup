@@ -6,5 +6,4 @@ prometheus_service_user: prometheus
 prometheus_service_group: prometheus
 prometheus_install_folder: "{{ base_install_folder }}/prometheus"
 prometheus_data_folder: "{{ base_data_folder }}/prometheus"
-prometheus_config_folder: "{{ prometheus_install_folder }}/conf"
 prometheus_logs_folder: "{{ base_data_folder }}/logs"

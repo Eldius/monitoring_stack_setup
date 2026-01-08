@@ -2,5 +2,5 @@
 - name: Deploy Mimir
   hosts: monitoring
   roles:
-    - base
-    - mimir
+    - eldius.monitoring_stack_setup.base
+    - eldius.monitoring_stack_setup.mimir

@@ -1,6 +1,6 @@
 #SPDX-License-Identifier: MIT-0
 ---
-# tasks file for Tempo
+# tasks file for Prometheus
 - name: Host info
   debug:
     msg: "{{ item }}"
@@ -13,35 +13,35 @@
     - "Dist: {{ ansible_facts['distribution'] }}"
     - "Dist Version: {{ ansible_facts['distribution_version'] }}"
 
-- name: Disabling and stopping Tempo service
-  systemd:
-    name: tempo
-    enabled: no
-    state: stopped
-  become: true
-
-- name: Removing systemd service file
-  file:
-    name: /etc/systemd/system/tempo.service
-    state: absent
-  become: true
-
-- name: Reloading systemd daemon
-  systemd:
-    daemon_reload: yes
-  become: true
-
-- name: Removing service user
-  user:
-    name: "{{ tempo_service_user }}"
-    state: absent
-  become: true
-
-- name: Removing service group
-  group:
-    name: "{{ tempo_service_group }}"
-    state: absent
-  become: true
+#- name: Disabling and stopping Prometheus service
+#  systemd:
+#    name: prometheus
+#    enabled: no
+#    state: stopped
+#  become: true
+#
+#- name: Removing systemd service file
+#  file:
+#    name: /etc/systemd/system/prometheus.service
+#    state: absent
+#  become: true
+#
+#- name: Reloading systemd daemon
+#  systemd:
+#    daemon_reload: yes
+#  become: true
+#
+#- name: Removing service user
+#  user:
+#    name: "{{ prometheus_service_user }}"
+#    state: absent
+#  become: true
+#
+#- name: Removing service group
+#  group:
+#    name: "{{ prometheus_service_group }}"
+#    state: absent
+#  become: true
 
 - name: Removing folders
   file:
@@ -49,6 +49,5 @@
     state: absent
   become: true
   with_items: 
-    - "{{ tempo_install_folder }}"
-    - "{{ tempo_config_folder }}"
-    - "{{ tempo_data_folder }}"
+    - "{{ prometheus_install_folder }}"
+    - "{{ prometheus_data_folder }}"

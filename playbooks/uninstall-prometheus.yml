@@ -4,5 +4,5 @@
   tasks:
     - name: Include Prometheus uninstallation tasks
       include_role:
-        name: prometheus
+        name: eldius.monitoring_stack_setup.prometheus
         tasks_from: uninstall.yml

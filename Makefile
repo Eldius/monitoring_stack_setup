@@ -1,4 +1,7 @@
 
+init:
+	ansible-galaxy collection install --force .
+
 install-mimir:
 	ansible-playbook -i ./env/local/ playbooks/install-mimir.yml
 
@@ -22,6 +25,12 @@ install-grafana:
 
 uninstall-grafana:
 	ansible-playbook -i ./env/local/ playbooks/uninstall-grafana.yml
+
+install-prometheus:
+	ansible-playbook -i ./env/local/ playbooks/install-prometheus.yml
+
+uninstall-prometheus:
+	ansible-playbook -i ./env/local/ playbooks/uninstall-prometheus.yml
 
 install-all:
 	ansible-playbook -i ./env/local/ playbooks/install-all.yml

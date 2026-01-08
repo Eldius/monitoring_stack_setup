@@ -4,5 +4,5 @@
   tasks:
     - name: Include Loki uninstallation tasks
       include_role:
-        name: loki
+        name: eldius.monitoring_stack_setup.loki
         tasks_from: uninstall.yml

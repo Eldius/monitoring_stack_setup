@@ -2,5 +2,5 @@
 - name: Deploy Prometheus
   hosts: monitoring
   roles:
-    - base
-    - prometheus
+    - eldius.monitoring_stack_setup.base
+    - eldius.monitoring_stack_setup.prometheus

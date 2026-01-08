@@ -4,5 +4,5 @@
   tasks:
     - name: Include Tempo uninstallation tasks
       include_role:
-        name: tempo
+        name: eldius.monitoring_stack_setup.tempo
         tasks_from: uninstall.yml

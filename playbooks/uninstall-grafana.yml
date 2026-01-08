@@ -1,8 +1,8 @@
 ---
-- name: Uninstall Loki
+- name: Uninstall Grafana
   hosts: monitoring
   tasks:
-    - name: Include Loki uninstallation tasks
+    - name: Include Grafana uninstallation tasks
       include_role:
-        name: grafana
+        name: eldius.monitoring_stack_setup.grafana
         tasks_from: uninstall.yml

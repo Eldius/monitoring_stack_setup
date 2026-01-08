@@ -4,5 +4,5 @@
   tasks:
     - name: Include Mimir uninstallation tasks
       include_role:
-        name: mimir
+        name: eldius.monitoring_stack_setup.mimir
         tasks_from: uninstall.yml

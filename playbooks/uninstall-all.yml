@@ -4,21 +4,21 @@
   tasks:
     - name: Include Grafana uninstallation tasks
       include_role:
-        name: grafana
+        name: eldius.monitoring_stack_setup.grafana
         tasks_from: uninstall.yml
     - name: Include Loki uninstallation tasks
       include_role:
-        name: loki
+        name: eldius.monitoring_stack_setup.loki
         tasks_from: uninstall.yml
     - name: Include Tempo uninstallation tasks
       include_role:
-        name: tempo
+        name: eldius.monitoring_stack_setup.tempo
         tasks_from: uninstall.yml
     - name: Include Mimir uninstallation tasks
       include_role:
-        name: mimir
+        name: eldius.monitoring_stack_setup.mimir
         tasks_from: uninstall.yml
     - name: Include base uninstallation tasks
       include_role:
-        name: base
+        name: eldius.monitoring_stack_setup.base
         tasks_from: uninstall.yml
