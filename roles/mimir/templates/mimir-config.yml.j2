@@ -3,40 +3,40 @@
 # Run Mimir in monolithic mode
 # Do not use this configuration in production.
 # It is for demonstration purposes only.
-multitenancy_enabled: false
+# multitenancy_enabled: false
 
-blocks_storage:
-  backend: filesystem
-  bucket_store:
-    sync_dir: {{ mimir_storage_bucket_store_dir }}
-  filesystem:
-    dir: {{ mimir_storage_filesystem_dir }}
-  tsdb:
-    dir: {{ mimir_storage_tsdb_dir }}
+# blocks_storage:
+#   backend: filesystem
+#   bucket_store:
+#     sync_dir: {{ mimir_storage_bucket_store_dir }}
+#   filesystem:
+#     dir: {{ mimir_storage_filesystem_dir }}
+#   tsdb:
+#     dir: {{ mimir_storage_tsdb_dir }}
 
-compactor:
-  data_dir: {{ mimir_compactor_data_dir }}
-  sharding_ring:
-    kvstore:
-      store: memberlist
+# compactor:
+#   data_dir: {{ mimir_compactor_data_dir }}
+#   sharding_ring:
+#     kvstore:
+#       store: memberlist
 
-distributor:
-  ring:
-    instance_addr: 0.0.0.0
-    kvstore:
-      store: memberlist
+# distributor:
+#   ring:
+#     instance_addr: 0.0.0.0
+#     kvstore:
+#       store: memberlist
 
-ingester:
-  ring:
-    instance_addr: 0.0.0.0
-    kvstore:
-      store: memberlist
-    replication_factor: 1
+# ingester:
+#   ring:
+#     instance_addr: 0.0.0.0
+#     kvstore:
+#       store: memberlist
+#     replication_factor: 1
 
-ruler_storage:
-  backend: filesystem
-  filesystem:
-    dir: {{ mimir_ruler_storage_dir }}
+# ruler_storage:
+#   backend: filesystem
+#   filesystem:
+#     dir: {{ mimir_ruler_storage_dir }}
 
 server:
   http_listen_port: {{ mimir_http_port }}
@@ -46,3 +46,69 @@ server:
 store_gateway:
   sharding_ring:
     replication_factor: 1
+
+multitenancy_enabled: false
+
+# memberlist:
+#   join_members: [] # Empty list
+#   pull_push_interval: 0s # Disables gossip updates
+#   instance_addr: 0.0.0.0
+#   instance_port: 9999
+
+
+# Configuration for monolithic mode with local filesystem storage and disabled memberlist gossip
+
+# Common configuration section for storage backend
+common:
+  storage:
+    backend: filesystem # Use the local filesystem for storage
+    filesystem:
+      dir: {{ mimir_data_folder }}/data # dir where data will be stored
+
+# Blocks storage configuration (TSDB blocks)
+blocks_storage:
+  backend: filesystem # Use the local filesystem
+  #dir: {{ mimir_storage_tsdb_dir }}/mimir/data/blocks # Subdir for TSDB blocks
+  bucket_store:
+    sync_dir: {{ mimir_storage_bucket_store_dir }}
+  filesystem:
+    dir: {{ mimir_storage_filesystem_dir }}
+  tsdb:
+    dir: {{ mimir_storage_tsdb_dir }}
+
+# Alertmanager storage configuration
+alertmanager_storage:
+  backend: filesystem # Use the local filesystem
+  filesystem:
+    dir: {{ mimir_data_folder }}/data/alertmanager # Subdir for Alertmanager data
+
+# Ruler storage configuration
+ruler_storage:
+  backend: filesystem # Use the local filesystem
+  filesystem:
+    dir: {{ mimir_ruler_storage_dir }} # Subdir for ruler data
+
+ingester:
+  ring:
+    # The address to advertise for this ingester.  Will be autodiscovered by
+    # looking up address on eth0 or en0; can be specified if this fails.
+    # address: 127.0.0.1
+
+
+    # We want to start immediately and flush on shutdown.
+    min_ready_duration: 0s
+    final_sleep: 0s
+    num_tokens: 512
+
+    # Use an in memory ring store, so we don't need to launch a Consul.
+    kvstore:
+      store: inmemory
+    replication_factor: 1
+
+memberlist:
+  bind_port: 9999
+  join_members: []
+
+# The -target=all CLI flag will still be required when starting the Mimir binary
+# to run in monolithic mode. The full run command will be:
+# ./mimir -config.file=config.yaml -target=all

@@ -25,5 +25,9 @@ RestartSec=5s
 # Requires the user 'alloy' to be in the 'systemd-journal' group
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 
+MemoryMax=1G
+# Optional: use MemoryHigh as the primary control mechanism
+MemoryHigh=750M
+
 [Install]
 WantedBy=multi-user.target

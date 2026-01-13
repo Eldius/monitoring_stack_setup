@@ -1,0 +1,7 @@
+---
+- name: Deploy Loki
+  hosts: monitoring
+  roles:
+    - role: eldius.monitoring_stack_setup.health
+      service_name: loki
+      health_endpoint: "http://localhost:3100/ready"

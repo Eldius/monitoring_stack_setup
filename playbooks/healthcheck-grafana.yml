@@ -1,0 +1,7 @@
+---
+- name: Deploy Loki
+  hosts: monitoring
+  roles:
+    - role: eldius.monitoring_stack_setup.health
+      service_name: grafana
+      health_endpoint: "http://localhost:3000/api/health"

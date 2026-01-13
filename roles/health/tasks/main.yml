@@ -1,0 +1,30 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for health
+- name: Checking service status
+  systemd:
+    name: "{{ service_name }}"
+  register: service_status
+  become: true
+
+- debug:
+    msg: "{{ service_status | to_json }}"
+
+- debug:
+    msg: "{{ service_name }} service is {{ 'running' if service_status.status.ActiveState == 'active' else 'not running' }}"
+
+- name: Verify service healthcheck endpoint is reachable
+  ansible.builtin.uri:
+    url: "{{ health_endpoint }}" # Adjust URL/port as needed
+    method: GET
+    status_code: 200
+    return_content: true
+  register: health_check_result
+  until: health_check_result.status == 200
+  retries: 10 # Number of retry attempts
+  delay: 5    # Delay in seconds between retries
+  tags: always
+
+- name: Healthcheck result
+  debug:
+    msg: "{{ health_check_result.content }}"

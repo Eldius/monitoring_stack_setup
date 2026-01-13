@@ -14,6 +14,9 @@ install-loki:
 uninstall-loki:
 	ansible-playbook -i ./env/local/ playbooks/uninstall-loki.yml
 
+healthcheck-loki:
+	ANSIBLE_NOCOWS=1 ansible-playbook -i ./env/local/ playbooks/healthcheck-loki.yml
+
 install-tempo:
 	ansible-playbook -i ./env/local/ playbooks/install-tempo.yml
 
@@ -26,6 +29,9 @@ install-grafana:
 uninstall-grafana:
 	ansible-playbook -i ./env/local/ playbooks/uninstall-grafana.yml
 
+healthcheck-grafana:
+	ansible-playbook -i ./env/local/ playbooks/healthcheck-grafana.yml
+
 install-prometheus:
 	ansible-playbook -i ./env/local/ playbooks/install-prometheus.yml
 
@@ -37,6 +43,9 @@ install-alloy:
 
 uninstall-alloy:
 	ansible-playbook -i ./env/local/ playbooks/uninstall-alloy.yml
+
+healthcheck-alloy:
+	ansible-playbook -i ./env/local/ playbooks/healthcheck-alloy.yml
 
 install-all:
 	ansible-playbook -i ./env/local/ playbooks/install-all.yml
