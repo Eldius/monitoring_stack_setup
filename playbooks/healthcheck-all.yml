@@ -2,12 +2,27 @@
 - name: Deploy Loki
   hosts: monitoring
   roles:
-    - role: eldius.monitoring_stack_setup.health
+    - name: Checking Alloy
+      role: eldius.monitoring_stack_setup.health
       service_name: alloy
       health_endpoint: "http://localhost:12345/-/health"
-    - role: eldius.monitoring_stack_setup.health
-      service_name: loki
-      health_endpoint: "http://localhost:3100/ready"
-    - role: eldius.monitoring_stack_setup.health
+    - name: Checking Grafana
+      role: eldius.monitoring_stack_setup.health
       service_name: grafana
       health_endpoint: "http://localhost:3000/api/health"
+    - name: Checking Loki
+      role: eldius.monitoring_stack_setup.health
+      service_name: loki
+      health_endpoint: "http://localhost:3100/ready"
+    - name: Checking Mimir
+      role: eldius.monitoring_stack_setup.health
+      service_name: mimir
+      health_endpoint: "http://localhost:9009/ready"
+    - name: Checking Prometheus
+      role: eldius.monitoring_stack_setup.health
+      service_name: prometheus
+      health_endpoint: "http://localhost:9090/-/healthy"
+    - name: Checking Tempo
+      role: eldius.monitoring_stack_setup.health
+      service_name: tempo
+      health_endpoint: "http://localhost:3200/ready"

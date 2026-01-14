@@ -1,0 +1,7 @@
+---
+- name: Healthcheck Tempo
+  hosts: monitoring
+  roles:
+    - role: eldius.monitoring_stack_setup.health
+      service_name: tempo
+      health_endpoint: "http://localhost:3200/ready"

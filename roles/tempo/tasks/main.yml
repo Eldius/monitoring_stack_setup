@@ -65,6 +65,15 @@
     mode: '0755'
   become: true
 
+- name: Configuring Tempo overrides
+  template:
+    src: overrides.yaml.j2
+    dest: "{{ tempo_config_folder }}/overrides.yaml"
+    owner: "{{ tempo_service_user }}"
+    group: "{{ tempo_service_group }}"
+    mode: '0755'
+  become: true
+
 - name: Creating systemd service file
   template:
     src: tempo.service.j2

@@ -1,0 +1,7 @@
+---
+- name: Healthcheck Prometheus
+  hosts: monitoring
+  roles:
+    - role: eldius.monitoring_stack_setup.health
+      service_name: prometheus
+      health_endpoint: "http://localhost:9090/-/healthy"

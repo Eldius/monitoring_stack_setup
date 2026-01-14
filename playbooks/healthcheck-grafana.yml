@@ -1,5 +1,5 @@
 ---
-- name: Deploy Loki
+- name: Healthcheck Loki
   hosts: monitoring
   roles:
     - role: eldius.monitoring_stack_setup.health

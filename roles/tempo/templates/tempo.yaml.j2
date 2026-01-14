@@ -79,7 +79,7 @@ storage:
       path: "{{ tempo_data_folder }}/blocks"
 
 overrides:
-  per_tenant_override_config: /etc/overrides.yaml
+  per_tenant_override_config: "{{ tempo_config_folder }}/overrides.yaml"
   defaults:
     cost_attribution:
       dimensions:

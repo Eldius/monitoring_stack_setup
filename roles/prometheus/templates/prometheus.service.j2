@@ -13,7 +13,8 @@ Type=simple
 # --storage.tsdb.retention.time=2h keeps local storage minimal since Mimir is the source of truth
 # --web.enable-lifecycle allows reloading via HTTP POST
 ExecStart={{ prometheus_install_folder }}/prometheus \
-  --config.file={{ prometheus_install_folder }}/prometheus.yml
+  --config.file={{ prometheus_install_folder }}/prometheus.yml \
+  --storage.tsdb.path={{ prometheus_data_folder }}
 
 # Tells Prometheus to reload config without restarting the process
 ExecReload=/bin/kill -HUP $MAINPID

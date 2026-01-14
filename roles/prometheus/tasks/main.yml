@@ -75,18 +75,18 @@
     mode: '0644'
   become: true
 
-#- name: Reloading systemd daemon
-#  systemd:
-#    daemon_reload: yes
-#  become: true
-#
-#- name: Enabling and starting Prometheus service
-#  systemd:
-#    name: prometheus
-#    enabled: yes
-#    state: started 
-#  become: true
-#
+- name: Reloading systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: true
+
+- name: Enabling and starting Prometheus service
+  systemd:
+    name: prometheus
+    enabled: yes
+    state: started 
+  become: true
+
 #- name: Checking Prometheus service status
 #  systemd:
 #    name: prometheus

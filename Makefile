@@ -52,3 +52,6 @@ install-all:
 
 uninstall-all:
 	ansible-playbook -i ./env/local/ playbooks/uninstall-all.yml
+
+healthcheck-all:
+	ansible-playbook -i ./env/local/ playbooks/healthcheck-all.yml
