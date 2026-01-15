@@ -22,5 +22,9 @@ ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
 RestartSec=5s
 
+MemoryMax=1G
+# Optional: use MemoryHigh as the primary control mechanism
+MemoryHigh=750M
+
 [Install]
 WantedBy=multi-user.target

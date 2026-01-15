@@ -1,3 +1,6 @@
 
 .tmp/
 *.tar.gz
+.venv/
+.idea/
+.vscode/

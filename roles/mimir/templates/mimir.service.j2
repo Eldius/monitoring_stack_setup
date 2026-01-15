@@ -28,5 +28,9 @@ ProtectKernelModules=true
 ProtectControlGroups=true
 #RestrictAddressFamilies=AF_INET AF_INET6
 
+MemoryMax=1G
+# Optional: use MemoryHigh as the primary control mechanism
+MemoryHigh=750M
+
 [Install]
 WantedBy=multi-user.target
