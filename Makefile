@@ -1,6 +1,6 @@
 
 init:
-	ansible-galaxy collection install --force .
+	uv run ansible-galaxy collection install --force .
 
 install-mimir:
 	uv run ansible-playbook -i ./env/local/ playbooks/install-mimir.yml

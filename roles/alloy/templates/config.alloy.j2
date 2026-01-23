@@ -47,5 +47,9 @@ prometheus.remote_write "prometheus_writer" {
 otelcol.exporter.otlp "tempo_exporter" {
   client {
     endpoint = "localhost:4319"
+    tls {
+      insecure             = true
+      insecure_skip_verify = true
+    }
   }
 }
