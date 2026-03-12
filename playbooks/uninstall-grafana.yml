@@ -1,6 +1,6 @@
 ---
 - name: Uninstall Grafana
-  hosts: monitoring
+  hosts: grafana
   tasks:
     - name: Include Grafana uninstallation tasks
       include_role:

@@ -1,6 +1,6 @@
 ---
 - name: Uninstall Alloy
-  hosts: monitoring
+  hosts: alloy
   tasks:
     - name: Include Alloy uninstallation tasks
       include_role:

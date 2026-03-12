@@ -1,6 +1,6 @@
 ---
 - name: Deploy Mimir
-  hosts: monitoring
+  hosts: mimir
   roles:
     - eldius.monitoring_stack_setup.base
     - eldius.monitoring_stack_setup.mimir

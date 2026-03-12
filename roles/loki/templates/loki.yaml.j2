@@ -5,9 +5,13 @@ server:
   grpc_listen_port: {{ loki_grpc_listen_port }}
   log_level: "{{ loki_log_level }}"
   grpc_server_max_concurrent_streams: 1000
+  grpc_server_max_recv_msg_size: 409715200 # 200 MB, might be too much, be careful
+  grpc_server_max_send_msg_size: 409715200 # 200 MB, might be too much, be careful
+  http_server_write_timeout: 310s
+  http_server_read_timeout: 310s
 
 common:
-  instance_addr: 127.0.0.1
+  instance_addr: 0.0.0.0
   path_prefix: {{ loki_common_path_prefix }}
   storage:
     filesystem:

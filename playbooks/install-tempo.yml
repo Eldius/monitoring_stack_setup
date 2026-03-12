@@ -1,6 +1,6 @@
 ---
 - name: Deploy Tempo
-  hosts: monitoring
+  hosts: tempo
   roles:
     - eldius.monitoring_stack_setup.base
     - eldius.monitoring_stack_setup.tempo

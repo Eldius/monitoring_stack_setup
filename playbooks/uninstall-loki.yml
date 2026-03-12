@@ -1,6 +1,6 @@
 ---
 - name: Uninstall Loki
-  hosts: monitoring
+  hosts: loki
   tasks:
     - name: Include Loki uninstallation tasks
       include_role:

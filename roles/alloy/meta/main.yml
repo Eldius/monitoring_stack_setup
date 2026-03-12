@@ -1,7 +1,7 @@
 #SPDX-License-Identifier: MIT-0
 galaxy_info:
   author: your name
-  description: your role description
+  description: Ansible role for alloy
   company: your company (optional)
 
   # If the issue tracker for your role is not on github, uncomment the

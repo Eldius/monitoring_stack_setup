@@ -1,6 +1,6 @@
 ---
 - name: Uninstall Tempo
-  hosts: monitoring
+  hosts: tempo
   tasks:
     - name: Include Tempo uninstallation tasks
       include_role:

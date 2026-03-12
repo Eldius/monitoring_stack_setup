@@ -1,11 +1,11 @@
 
 otelcol.receiver.otlp "otlp_receiver" {
   grpc {
-    endpoint = "127.0.0.1:4317"
+    endpoint = "0.0.0.0:{{alloy_otlp_grpc_ingest_port}}"
   }
 
   http {
-    endpoint = "127.0.0.1:4318"
+    endpoint = "0.0.0.0:{{alloy_otlp_http_ingest_port}}"
   }
 
   output {
@@ -16,6 +16,10 @@ otelcol.receiver.otlp "otlp_receiver" {
 }
 
 otelcol.processor.batch "batch_processor" {
+  // Time-based batching: data is sent every 1000ms
+  timeout = "1000ms"
+  // Size-based batching: data is sent when the batch size reaches 1000 items
+  // send_batch_size = 1000
   output {
     metrics = [otelcol.exporter.prometheus.prometheus_exporter.input]
     logs    = [otelcol.exporter.loki.loki_exporter.input]
@@ -23,33 +27,71 @@ otelcol.processor.batch "batch_processor" {
   }
 }
 
-
 otelcol.exporter.loki "loki_exporter" {
   forward_to = [loki.write.loki_writer.receiver]
-}
-
-loki.write "loki_writer" {
-  endpoint {
-    url = "http://localhost:3100/loki/api/v1/push"
-  }
 }
 
 otelcol.exporter.prometheus "prometheus_exporter" {
   forward_to = [prometheus.remote_write.prometheus_writer.receiver]
 }
 
+loki.write "loki_writer" {
+  endpoint {
+    url = "{{alloy_loki_push_url}}"
+  }
+}
+
 prometheus.remote_write "prometheus_writer" {
   endpoint {
-    url = "http://prometheus:9090/api/v1/write"
+    url = "{{alloy_prometheus_remote_write_url}}"
   }
 }
 
 otelcol.exporter.otlp "tempo_exporter" {
   client {
-    endpoint = "localhost:4319"
+    endpoint = "{{alloy_tempo_otlp_endpoint}}"
     tls {
       insecure             = true
       insecure_skip_verify = true
     }
   }
+}
+
+loki.source.journal "logs_integrations_integrations_node_exporter_journal_scrape" {
+  max_age       = "24h0m0s"
+  relabel_rules = discovery.relabel.logs_integrations_integrations_node_exporter_journal_scrape.rules
+  forward_to    = [loki.write.loki_writer.receiver]
+}
+
+discovery.relabel "logs_integrations_integrations_node_exporter_journal_scrape" {
+  targets = []
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+
+  rule {
+    source_labels = ["__journal__boot_id"]
+    target_label  = "boot_id"
+  }
+
+  rule {
+    source_labels = ["__journal__transport"]
+    target_label  = "transport"
+  }
+
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "level"
+  }
+}
+
+{# logging {
+    level = "debug"
+    format = "json"
+} #}
+
+livedebugging {
+  enabled = true
 }

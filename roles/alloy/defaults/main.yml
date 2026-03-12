@@ -13,3 +13,9 @@ alloy_http_listen_port: 12345
 
 alloy_service_group: alloy
 alloy_service_user: alloy
+
+alloy_loki_host: "http://localhost:3100"
+alloy_loki_push_url: "{{alloy_loki_host}}/loki/api/v1/push"
+alloy_prometheus_host: "http://localhost:9009"
+alloy_prometheus_remote_write_url: "{{alloy_prometheus_host}}/api/v1/push"
+alloy_tempo_otlp_endpoint: "localhost:4319"

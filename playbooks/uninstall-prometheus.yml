@@ -1,6 +1,6 @@
 ---
 - name: Uninstall Prometheus
-  hosts: monitoring
+  hosts: prometheus
   tasks:
     - name: Include Prometheus uninstallation tasks
       include_role:

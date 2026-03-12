@@ -1,6 +1,6 @@
 ---
 - name: Uninstall Mimir
-  hosts: monitoring
+  hosts: mimir
   tasks:
     - name: Include Mimir uninstallation tasks
       include_role:
