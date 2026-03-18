@@ -33,7 +33,13 @@ def main():
     net = address2net(IPv4Address(args.baseip))
     print("searching", net)
 
-    asyncio.run(get_hosts(net, args.port, args.timeout, args.service))
+    result = asyncio.run(get_hosts(net, args.port, args.timeout, args.service))
+
+    print(
+        f"\n\n---\nfound {len(result)} hosts with open port {args.port} on {args.baseip} subnet"
+    )
+    for host, service in result:
+        print(f"- {host}: {service}")
 
 
 if __name__ == "__main__":
