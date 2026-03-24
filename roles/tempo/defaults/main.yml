@@ -11,3 +11,4 @@ tempo_http_listen_port: 3200
 tempo_grpc_listen_port: 9095
 tempo_receiver_grpc_listen_port: 4319
 tempo_receiver_http_listen_port: 4320
+tempo_compactor_block_retention: 48h

@@ -51,7 +51,7 @@ ingester:
 
 compactor:
   compaction:
-    block_retention: 720h # overall Tempo trace retention. set for demo purposes
+    block_retention: {{ tempo_compactor_block_retention }} # overall Tempo trace retention. set for demo purposes
 
 metrics_generator:
   registry:
@@ -77,7 +77,9 @@ storage:
       path: "{{ tempo_data_folder }}/wal" # where to store the wal locally
     local:
       path: "{{ tempo_data_folder }}/blocks"
-
+    pool:
+      max_workers: 100
+      queue_depth: 10000
 overrides:
   per_tenant_override_config: "{{ tempo_config_folder }}/overrides.yaml"
   defaults:

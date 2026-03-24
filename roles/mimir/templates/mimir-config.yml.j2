@@ -75,6 +75,7 @@ blocks_storage:
     dir: {{ mimir_storage_filesystem_dir }}
   tsdb:
     dir: {{ mimir_storage_tsdb_dir }}
+    retention_period: {{ mimir_storage_tsdb_retention_period }} # Retain blocks for 48 hours
 
 # Alertmanager storage configuration
 alertmanager_storage:
@@ -104,6 +105,14 @@ ingester:
     kvstore:
       store: inmemory
     replication_factor: 1
+
+compactor:
+  data_dir: {{ mimir_compactor_data_dir }}
+  retention_interval: {{ mimir_compactor_retention_interval }}
+  sharding_ring:
+    kvstore:
+      store: memberlist
+
 
 memberlist:
   bind_port: 9999

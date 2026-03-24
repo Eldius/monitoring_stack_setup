@@ -18,3 +18,5 @@ mimir_storage_filesystem_dir: "{{ mimir_data_folder }}/fs/tsdb"
 mimir_storage_tsdb_dir: "{{ mimir_data_folder }}/tmp/tsdb"
 mimir_compactor_data_dir: "{{ mimir_data_folder }}/tmp/compactor"
 mimir_ruler_storage_dir: "{{ mimir_data_folder }}/tmp/rules"
+mimir_storage_tsdb_retention_period: 48h
+mimir_compactor_retention_interval: 2h
