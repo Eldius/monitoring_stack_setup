@@ -16,3 +16,4 @@ loki_rules_storage_directory: "{{ loki_data_folder }}/tmp/loki/rules"
 loki_http_listen_port: 3100
 loki_grpc_listen_port: 9096
 loki_limits_retention_period: 48h
+loki_compactor_working_directory: "{{ loki_data_folder }}/tmp/loki/compactor"
