@@ -16,10 +16,7 @@ otelcol.receiver.otlp "otlp_receiver" {
 }
 
 otelcol.processor.batch "batch_processor" {
-  // Time-based batching: data is sent every 1000ms
   timeout = "1000ms"
-  // Size-based batching: data is sent when the batch size reaches 1000 items
-  // send_batch_size = 1000
   output {
     metrics = [otelcol.exporter.prometheus.prometheus_exporter.input]
     logs    = [otelcol.exporter.loki.loki_exporter.input]
@@ -28,7 +25,7 @@ otelcol.processor.batch "batch_processor" {
 }
 
 otelcol.exporter.loki "loki_exporter" {
-  forward_to = [loki.write.loki_writer.receiver]
+  forward_to = [loki.process.flatten_logs.receiver]
 }
 
 otelcol.exporter.prometheus "prometheus_exporter" {
@@ -94,4 +91,34 @@ discovery.relabel "logs_integrations_integrations_node_exporter_journal_scrape" 
 
 livedebugging {
   enabled = true
+}
+
+loki.process "flatten_logs" {
+  stage.json {
+    expressions = {
+      "attributes" = "attributes",
+      "msg"        = "body",
+    }
+  }
+
+  stage.structured_metadata {
+    values = {
+      attributes = "attributes",
+      resources  = "resources",
+    }
+  }
+
+  stage.output {
+    source = "msg"
+  }
+  stage.output {
+    source = "attributes"
+  }
+
+  stage.output {
+    source = "resources"
+  }
+
+
+  forward_to = [loki.write.loki_writer.receiver]
 }

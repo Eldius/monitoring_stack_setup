@@ -1,0 +1,57 @@
+---
+receivers:
+  fluentforward:
+    endpoint: 127.0.0.1:6543
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:55689
+
+processors:
+  batch:
+
+exporters:
+  otlp/jaeger: # Jaeger supports OTLP directly
+    endpoint: "{{ ansible_default_ipv4.address }}:4317"
+    tls:
+      insecure: true
+      insecure_skip_verify: true
+  prometheusremotewrite:
+    endpoint: http://{{ ansible_default_ipv4.address }}:9009/api/v1/push
+    tls:
+      insecure: true
+      insecure_skip_verify: true
+    resource_to_telemetry_conversion:
+      enabled: false # Convert resource attributes to metric labels
+  otlp/tempo:
+    endpoint: {{ ansible_default_ipv4.address }}:5317
+    tls:
+      insecure: true
+      insecure_skip_verify: true
+  otlphttp/loki:
+    endpoint: http://{{ ansible_default_ipv4.address }}:3100/otlp/v1/logs
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/jaeger]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheusremotewrite]
+    logs:
+      receivers: [fluentforward]
+      processors: [batch]
+      exporters: [otlphttp/loki]
+  extensions: [health_check, pprof]
+
+extensions:
+  pprof:
+  health_check:
+    endpoint: "0.0.0.0:13133"
+    path: "/health/status"
+    check_collector_pipeline:
+      enabled: true
+      interval: "5m"
+      exporter_failure_threshold: 5

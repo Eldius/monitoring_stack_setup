@@ -1,0 +1,70 @@
+---
+receivers:
+  otlp/traces:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:55689
+  otlp/metrics:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:55690
+
+processors:
+  batch:
+
+exporters:
+  otlp/jaeger: # Jaeger supports OTLP directly
+    endpoint: {{ ansible_default_ipv4.address }}:4317
+    tls:
+      insecure: true
+      insecure_skip_verify: true
+  # prometheusremotewrite:
+  #   endpoint: http://{{ ansible_default_ipv4.address }}:9090
+  prometheusremotewrite:
+    endpoint: http://{{ ansible_default_ipv4.address }}:9090
+    tls:
+      insecure: true
+      insecure_skip_verify: true
+    resource_to_telemetry_conversion:
+      enabled: false # Convert resource attributes to metric labels
+  prometheus:
+    endpoint: "{{ ansible_default_ipv4.address }}:9089"
+    tls:
+      insecure: true
+      insecure_skip_verify: true
+    namespace: otelmetrics
+    send_timestamps: true
+    metric_expiration: 180m
+    enable_open_metrics: true
+    add_metric_suffixes: false
+    resource_to_telemetry_conversion:
+      enabled: true
+  otlp/tempo:
+    endpoint: {{ ansible_default_ipv4.address }}:5317
+    tls:
+      insecure: true
+      insecure_skip_verify: true
+
+service:
+  pipelines:
+    traces/dev:
+      receivers: [otlp/traces]
+      processors: [batch]
+      exporters: [otlp/jaeger, otlp/tempo]
+    metrics/prod:
+      receivers: [otlp/metrics]
+      processors: [batch]
+      exporters: [prometheusremotewrite,prometheus]
+      # exporters: [prometheus]
+  extensions: [health_check, pprof, zpages]
+
+extensions:
+  pprof:
+  zpages:
+  health_check:
+    endpoint: "0.0.0.0:13133"
+    path: "/health/status"
+    check_collector_pipeline:
+      enabled: true
+      interval: "5m"
+      exporter_failure_threshold: 5

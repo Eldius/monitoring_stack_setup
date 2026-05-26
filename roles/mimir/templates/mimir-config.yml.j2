@@ -108,7 +108,7 @@ ingester:
 
 compactor:
   data_dir: {{ mimir_compactor_data_dir }}
-  retention_interval: {{ mimir_compactor_retention_interval }}
+  #retention_interval: {{ mimir_compactor_retention_interval }}
   sharding_ring:
     kvstore:
       store: memberlist

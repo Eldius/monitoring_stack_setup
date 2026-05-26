@@ -1,0 +1,10 @@
+---
+# defaults file for otel_collector
+otel_collector_fluentforward_receiver_enabled: true
+otel_collector_otlptraces_receiver_enabled: true
+otel_collector_otlpmetrics_receiver_enabled: true
+otel_collector_loki_exporter_enabled: true
+otel_collector_tempo_exporter_enabled: true
+otel_collector_jaeger_exporter_enabled: true
+otel_collector_prometheus_remotewrite_enabled: true
+otel_collector_victoriametrics_exporter_enabled: true

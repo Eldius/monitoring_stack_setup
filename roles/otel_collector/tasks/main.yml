@@ -1,0 +1,98 @@
+---
+# tasks file for otel_collector
+# - name: Install OTEL Collector package
+#   ansible.builtin.apt:
+#     deb: "{{ package_url }}"
+#   become: true
+#   register: package_install_res
+
+- name: Create OTEL Collector user group
+  ansible.builtin.group:
+    name: otel
+    state: present
+  become: true
+
+- name: Create OTEL Collector system user
+  ansible.builtin.user:
+    name: otel
+    comment: OTEL Collector service user
+    home: "{{ install_dir }}"
+    group: otel
+    state: present
+    system: true
+  become: true
+
+
+- name: Create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: otel
+    group: otel
+  become: true
+  loop:
+    - "{{ install_dir }}"
+    - "{{ install_dir }}/bin"
+    - "{{ install_dir }}/conf"
+    - "{{ install_dir }}/data"
+    - "{{ install_dir }}/tools"
+    - "{{ install_dir }}/tmp"
+  register: create_folders_res
+
+- name: Building OTEL Collector
+  ansible.builtin.import_tasks: build_collector.yml
+
+- name: Generate config.yaml file
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: "{{ install_dir }}/conf/config.yaml"
+    owner: otel
+    group: otel
+    mode: "0766"
+  become: true
+  register: config_task_res
+
+- name: Generate environment file
+  ansible.builtin.template:
+    src: otelcol.conf.j2
+    dest: "{{ install_dir }}/conf/otelcol.conf"
+    owner: otel
+    group: otel
+    mode: "0766"
+  become: true
+  register: config_task_res
+
+- name: Create service definition file
+  ansible.builtin.template:
+    src: otelcol.service.j2
+    dest: /etc/systemd/system/otelcol.service
+    owner: root
+    group: root
+  become: true
+  register: servicedef_task_res
+
+- name: Restart Collector
+  ansible.builtin.service:
+    name: "otelcol"
+    state: "restarted"
+    enabled: true
+    daemon_reload: true
+  when: config_task_res.changed or create_folders_res.changed or servicedef_task_res.changed
+  become: true
+
+# - name: Wait until OTEL Collector is up and running...
+#   uri:
+#     url: 'http://{{ ansible_default_ipv4.address }}:3100/ready'
+#     return_content: yes
+#     validate_certs: no
+#     status_code:
+#       - 200
+#   until: uri_output.status == 200
+#   retries: 24 # Retries for 24 * 15 seconds = 360 seconds = 6 minutes
+#   delay: 15 # Every 15 seconds
+#   register: uri_output
+
+# - name: API test result
+#   debug:
+#     msg: "{{ uri_output }}"

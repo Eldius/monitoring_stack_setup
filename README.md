@@ -12,6 +12,7 @@ The collection provides roles and playbooks for the following services:
 - **Tempo**: Distributed tracing.
 - **Mimir**: Scalable, long-term storage for Prometheus metrics.
 - **Alloy**: Grafana's OpenTelemetry-compatible collector for logs, metrics, and traces.
+- **OpenTelemetry Collector**: Vendor-agnostic proxy to receive, process, and export telemetry data.
 
 ## Prerequisites
 
@@ -49,6 +50,7 @@ The project includes a `Makefile` to simplify common operations.
 | `make install-tempo` | Deploys only Tempo. |
 | `make install-mimir` | Deploys only Mimir. |
 | `make install-alloy` | Deploys only Alloy. |
+| `make install-otelcoll` | Deploys only OpenTelemetry Collector. |
 | `make healthcheck-all` | Validates the status of all deployed services. |
 | `make uninstall-all` | Removes the entire stack from the target hosts. |
 

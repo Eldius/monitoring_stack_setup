@@ -1,0 +1,8 @@
+---
+- name: Uninstall Alloy
+  hosts: otel_collector
+  tasks:
+    - name: Include OTEL Collector uninstallation tasks
+      include_role:
+        name: eldius.monitoring_stack_setup.otel_collector
+        tasks_from: uninstall.yml
