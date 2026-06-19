@@ -1,5 +1,17 @@
 ---
 # defaults file for otel_collector
+otel_collector_version: 0.127.0
+otel_collector_go_version: 1.26.3
+
+otel_collector_service_user: otel
+otel_collector_service_group: otel
+
+otel_collector_install_folder: "{{ base_install_folder }}/otel"
+otel_collector_data_folder: "{{ base_data_folder }}/otel"
+otel_collector_config_folder: "{{ otel_collector_install_folder }}/conf"
+otel_collector_tools_folder: "{{ otel_collector_install_folder }}/tools"
+otel_collector_tmp_folder: "{{ otel_collector_install_folder }}/tmp"
+
 otel_collector_fluentforward_receiver_enabled: true
 otel_collector_otlptraces_receiver_enabled: true
 otel_collector_otlpmetrics_receiver_enabled: true

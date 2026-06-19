@@ -1,5 +1,5 @@
 ---
-- name: Uninstall Alloy
+- name: Uninstall OTEL Collector
   hosts: otel_collector
   tasks:
     - name: Include OTEL Collector uninstallation tasks

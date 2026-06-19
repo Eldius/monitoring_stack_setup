@@ -1,6 +1,14 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # tasks file for tempo
+- name: Validate Tempo variables
+  ansible.builtin.assert:
+    that:
+      - tempo_version is defined
+      - tempo_install_folder is defined
+      - tempo_data_folder is defined
+    fail_msg: "Mandatory Tempo variables are missing."
+
 - name: Host info
   debug:
     msg: "{{ item }}"
@@ -103,3 +111,7 @@
 
 - debug:
     msg: "Tempo service is {{ 'running' if tempo_service_status.status.ActiveState == 'active' else 'not running' }}"
+
+- name: Validating installation
+  ansible.builtin.include_tasks: validate.yml
+  tags: validate

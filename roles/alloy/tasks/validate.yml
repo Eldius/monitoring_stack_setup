@@ -1,0 +1,37 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: Validate Alloy installation
+  block:
+    - name: Verify Alloy service is running
+      ansible.builtin.systemd:
+        name: alloy
+      register: alloy_service_check
+      failed_when: alloy_service_check.status.ActiveState != 'active'
+
+    - name: Wait for Alloy to start listening on port {{ alloy_http_listen_port }}
+      ansible.builtin.wait_for:
+        port: "{{ alloy_http_listen_port }}"
+        timeout: 30
+
+    - name: Verify Alloy health endpoint
+      ansible.builtin.uri:
+        url: "http://localhost:{{ alloy_http_listen_port }}/-/ready"
+        method: GET
+        status_code: 200
+      register: alloy_health_check
+      until: alloy_health_check.status == 200
+      retries: 5
+      delay: 2
+
+    - name: Check Alloy configuration file exists
+      ansible.builtin.stat:
+        path: "{{ alloy_config_folder }}/config.alloy"
+      register: alloy_config_stat
+      failed_when: not alloy_config_stat.stat.exists
+
+    - name: Verify Alloy binary exists
+      ansible.builtin.stat:
+        path: "{{ alloy_install_folder }}/alloy-{{ ansible_facts['system'] | lower }}-{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else ansible_facts['architecture'] | lower }}"
+      register: alloy_binary_stat
+      failed_when: not alloy_binary_stat.stat.exists
+  become: true

@@ -1,98 +1,107 @@
 ---
 # tasks file for otel_collector
-# - name: Install OTEL Collector package
-#   ansible.builtin.apt:
-#     deb: "{{ package_url }}"
-#   become: true
-#   register: package_install_res
+- name: Host info
+  debug:
+    msg: "{{ item }}"
+  with_items:
+    - "FQDN: {{ ansible_facts['fqdn'] }}"
+    - "ARCH: {{ ansible_facts['architecture'] }}"
+    - "OS: {{ ansible_facts['system'] }}"
+    - "Kernel: {{ ansible_facts['kernel'] }}"
+    - "OS Family: {{ ansible_facts['os_family'] }}"
+    - "Dist: {{ ansible_facts['distribution'] }}"
+    - "Dist Version: {{ ansible_facts['distribution_version'] }}"
 
-- name: Create OTEL Collector user group
+- name: Creating OTEL Collector service group
   ansible.builtin.group:
-    name: otel
+    name: "{{ otel_collector_service_group }}"
     state: present
   become: true
 
-- name: Create OTEL Collector system user
+- name: Creating OTEL Collector service user
   ansible.builtin.user:
-    name: otel
+    name: "{{ otel_collector_service_user }}"
     comment: OTEL Collector service user
-    home: "{{ install_dir }}"
-    group: otel
+    home: "{{ otel_collector_install_folder }}"
+    group: "{{ otel_collector_service_group }}"
     state: present
     system: true
   become: true
 
-
-- name: Create directories
+- name: Preparing folders
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: '0755'
-    owner: otel
-    group: otel
+    owner: "{{ otel_collector_service_user }}"
+    group: "{{ otel_collector_service_group }}"
   become: true
   loop:
-    - "{{ install_dir }}"
-    - "{{ install_dir }}/bin"
-    - "{{ install_dir }}/conf"
-    - "{{ install_dir }}/data"
-    - "{{ install_dir }}/tools"
-    - "{{ install_dir }}/tmp"
+    - "{{ otel_collector_install_folder }}"
+    - "{{ otel_collector_install_folder }}/bin"
+    - "{{ otel_collector_config_folder }}"
+    - "{{ otel_collector_data_folder }}"
+    - "{{ otel_collector_tools_folder }}"
+    - "{{ otel_collector_tmp_folder }}"
   register: create_folders_res
 
 - name: Building OTEL Collector
   ansible.builtin.import_tasks: build_collector.yml
 
-- name: Generate config.yaml file
+- name: Generating config.yaml file
   ansible.builtin.template:
     src: config.yaml.j2
-    dest: "{{ install_dir }}/conf/config.yaml"
-    owner: otel
-    group: otel
-    mode: "0766"
+    dest: "{{ otel_collector_config_folder }}/config.yaml"
+    owner: "{{ otel_collector_service_user }}"
+    group: "{{ otel_collector_service_group }}"
+    mode: "0755"
   become: true
   register: config_task_res
 
-- name: Generate environment file
+- name: Generating environment file
   ansible.builtin.template:
     src: otelcol.conf.j2
-    dest: "{{ install_dir }}/conf/otelcol.conf"
-    owner: otel
-    group: otel
-    mode: "0766"
+    dest: "{{ otel_collector_config_folder }}/otelcol.conf"
+    owner: "{{ otel_collector_service_user }}"
+    group: "{{ otel_collector_service_group }}"
+    mode: "0755"
   become: true
-  register: config_task_res
+  register: env_task_res
 
-- name: Create service definition file
+- name: Creating systemd service file
   ansible.builtin.template:
     src: otelcol.service.j2
     dest: /etc/systemd/system/otelcol.service
     owner: root
     group: root
+    mode: '0644'
   become: true
   register: servicedef_task_res
 
-- name: Restart Collector
+- name: Reloading systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  become: true
+
+- name: Enabling and starting OTEL Collector service
+  ansible.builtin.service:
+    name: "otelcol"
+    state: "started"
+    enabled: true
+  become: true
+
+- name: Restarting OTEL Collector if config changed
   ansible.builtin.service:
     name: "otelcol"
     state: "restarted"
-    enabled: true
-    daemon_reload: true
-  when: config_task_res.changed or create_folders_res.changed or servicedef_task_res.changed
+  when: config_task_res.changed or env_task_res.changed or servicedef_task_res.changed
   become: true
 
-# - name: Wait until OTEL Collector is up and running...
-#   uri:
-#     url: 'http://{{ ansible_default_ipv4.address }}:3100/ready'
-#     return_content: yes
-#     validate_certs: no
-#     status_code:
-#       - 200
-#   until: uri_output.status == 200
-#   retries: 24 # Retries for 24 * 15 seconds = 360 seconds = 6 minutes
-#   delay: 15 # Every 15 seconds
-#   register: uri_output
+- name: Checking OTEL Collector service status
+  ansible.builtin.systemd:
+    name: otelcol
+  register: otel_service_status
+  become: true
 
-# - name: API test result
-#   debug:
-#     msg: "{{ uri_output }}"
+- debug:
+    msg: "OTEL Collector service is {{ 'running' if otel_service_status.status.ActiveState == 'active' else 'not running' }}"

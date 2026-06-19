@@ -1,0 +1,53 @@
+---
+# tasks file for otel_collector
+- name: Host info
+  debug:
+    msg: "{{ item }}"
+  with_items:
+    - "FQDN: {{ ansible_facts['fqdn'] }}"
+    - "ARCH: {{ ansible_facts['architecture'] }}"
+    - "OS: {{ ansible_facts['system'] }}"
+    - "Kernel: {{ ansible_facts['kernel'] }}"
+    - "OS Family: {{ ansible_facts['os_family'] }}"
+    - "Dist: {{ ansible_facts['distribution'] }}"
+    - "Dist Version: {{ ansible_facts['distribution_version'] }}"
+
+- name: Disabling and stopping OTEL Collector service
+  ansible.builtin.systemd:
+    name: otelcol
+    enabled: no
+    state: stopped
+  become: true
+  ignore_errors: true
+
+- name: Removing systemd service file
+  ansible.builtin.file:
+    name: /etc/systemd/system/otelcol.service
+    state: absent
+  become: true
+
+- name: Reloading systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  become: true
+
+- name: Removing OTEL Collector service user
+  ansible.builtin.user:
+    name: "{{ otel_collector_service_user }}"
+    state: absent
+  become: true
+
+- name: Removing OTEL Collector service group
+  ansible.builtin.group:
+    name: "{{ otel_collector_service_group }}"
+    state: absent
+  become: true
+
+- name: Removing folders
+  ansible.builtin.file:
+    name: "{{ item }}"
+    state: absent
+  become: true
+  loop:
+    - "{{ otel_collector_install_folder }}"
+    - "{{ otel_collector_data_folder }}"

@@ -1,8 +1,13 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # tasks file for loki
-#wget https://dl.grafana.com/grafana-enterprise/release/12.3.1/grafana-enterprise_12.3.1_20271043721_linux_amd64.tar.gz
-#tar -zxvf grafana-enterprise_12.3.1_20271043721_linux_amd64.tar.gz
+- name: Validate Loki variables
+  ansible.builtin.assert:
+    that:
+      - loki_install_folder is defined
+      - loki_data_folder is defined
+      - loki_http_listen_port is defined
+    fail_msg: "Mandatory Loki variables are missing."
 
 - name: Host info
   debug:
@@ -94,3 +99,7 @@
 
 - debug:
     msg: "Loki service is {{ 'running' if loki_service_status.status.ActiveState == 'active' else 'not running' }}"
+
+- name: Validating installation
+  ansible.builtin.include_tasks: validate.yml
+  tags: validate

@@ -2,22 +2,22 @@
 dist:
   name: otelcol
   description: Local OpenTelemetry Collector binary
-  output_path: {{ install_dir }}/bin
+  output_path: {{ otel_collector_install_folder }}/bin
 exporters:
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v{{ collector_version }}
-  - gomod: go.opentelemetry.io/collector/exporter/debugexporter v{{ collector_version }}
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/opensearchexporter v{{ collector_version }}
-  - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v{{ collector_version }}
-  - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v{{ collector_version }}
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusremotewriteexporter v{{ otel_collector_version }}
+  - gomod: go.opentelemetry.io/collector/exporter/debugexporter v{{ otel_collector_version }}
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/opensearchexporter v{{ otel_collector_version }}
+  - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v{{ otel_collector_version }}
+  - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v{{ otel_collector_version }}
 
 
 
 receivers:
-  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v{{ collector_version }}
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/fluentforwardreceiver v{{ collector_version }}
+  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v{{ otel_collector_version }}
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/fluentforwardreceiver v{{ otel_collector_version }}
 
 processors:
-  - gomod: go.opentelemetry.io/collector/processor/batchprocessor v{{ collector_version }}
+  - gomod: go.opentelemetry.io/collector/processor/batchprocessor v{{ otel_collector_version }}
 
 providers:
   - gomod: go.opentelemetry.io/collector/confmap/provider/envprovider v1.18.0
@@ -27,6 +27,6 @@ providers:
   - gomod: go.opentelemetry.io/collector/confmap/provider/yamlprovider v1.18.0
 
 extensions:
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v{{ collector_version }}
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v{{ collector_version }}
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckv2extension v{{ collector_version }}
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v{{ otel_collector_version }}
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v{{ otel_collector_version }}
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckv2extension v{{ otel_collector_version }}

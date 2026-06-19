@@ -1,6 +1,14 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # tasks file for prometheus
+- name: Validate Prometheus variables
+  ansible.builtin.assert:
+    that:
+      - prometheus_version is defined
+      - prometheus_install_folder is defined
+      - prometheus_data_folder is defined
+    fail_msg: "Mandatory Prometheus variables are missing."
+
 - name: Host info
   debug:
     msg: "{{ item }}"
@@ -87,11 +95,6 @@
     state: started 
   become: true
 
-#- name: Checking Prometheus service status
-#  systemd:
-#    name: prometheus
-#  register: prometheus_service_status
-#  become: true
-#
-#- debug:
-#    msg: "Prometheus service is {{ 'running' if prometheus_service_status.status.ActiveState == 'active' else 'not running' }}"
+- name: Validating installation
+  ansible.builtin.include_tasks: validate.yml
+  tags: validate

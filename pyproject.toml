@@ -3,10 +3,11 @@ name = "monitoring-stack-setup"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.12.11"
+requires-python = ">=3.12.12,<4.0.0"
 dependencies = [
     "ansible==13.2.0",
     "ansible-core==2.20.1",
+    "ansible-helper-scripts",
     "cffi==2.0.0",
     "cryptography==46.0.3",
     "findssh>=2.0.1",
@@ -17,3 +18,6 @@ dependencies = [
     "pyyaml==6.0.3",
     "resolvelib==1.2.1",
 ]
+
+[tool.uv.sources]
+ansible-helper-scripts = { git = "https://github.com/Eldius/ansible_help_scripts.git" }

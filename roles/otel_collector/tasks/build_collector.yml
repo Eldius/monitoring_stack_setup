@@ -2,116 +2,84 @@
 - name: Testing variables
   debug:
     msg:
-      "collector_version": "{{ collector_version }}"
-      "package_url": "{{ package_url }}"
-      "builder_binary_url": "{{ builder_binary_url }}"
-      "go_sdk_package_url": "{{ go_sdk_package_url }}"
-      "install_arch": "{{ install_arch }}"
+      "otel_collector_version": "{{ otel_collector_version }}"
+      "otel_collector_go_sdk_package_url": "{{ otel_collector_go_sdk_package_url }}"
+      "otel_collector_install_arch": "{{ otel_collector_install_arch }}"
 
-- name: Unpack GO SDK package
+- name: Unpacking GO SDK package
   ansible.builtin.unarchive:
-    src: "{{ go_sdk_package_url }}"
-    dest: "{{ install_dir }}/tools"
+    src: "{{ otel_collector_go_sdk_package_url }}"
+    dest: "{{ otel_collector_tools_folder }}"
     mode: '0755'
-    owner: otel
-    group: otel
+    owner: "{{ otel_collector_service_user }}"
+    group: "{{ otel_collector_service_group }}"
     remote_src: true
   become: true
   args:
-    creates: "{{ install_dir }}/tools/go"
+    creates: "{{ otel_collector_tools_folder }}/go"
 
-- name: List Go SDK files
-  shell: "ls -lha {{ install_dir }}/tools"
-  environment:
-    MY_ENV_VARIABLE: whatever_value
-
-- name: Debug Go version
+- name: Debugging Go version
   shell: "go version"
   environment:
-    PATH: "{{ ansible_env.PATH }}:{{ install_dir }}/tools/go/bin"
+    PATH: "{{ ansible_env.PATH }}:{{ otel_collector_tools_folder }}/go/bin"
   register: go_version_res
 
-- name: Debug Go version
+- name: Debugging Go version
   debug:
     msg: "{{ go_version_res.stdout_lines }}"
 
-- name: Debug PATH variable
-  ansible.builtin.shell: "echo $PATH"
-  environment:
-    PATH: "{{ ansible_env.PATH }}:{{ install_dir }}/tools/go/bin"
-  register: path_variable_res
-
-- name: Debug PATH variable
-  ansible.builtin.debug:
-    msg: "{{ path_variable_res.stdout_lines }}"
-
-- name: Fetch latest version from OTEL Collector Github repo
+- name: Fetching latest version from OTEL Collector Github repo
   ansible.builtin.shell: "curl -s https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/latest | jq -r .tag_name | sed 's/^v//'"
   register: remote_version_output
-  # Use | default('') to handle cases where the variable might be undefined
-  when: collector_version == 'latest' or collector_version | default('') == ''
+  when: otel_collector_version == 'latest' or otel_collector_version | default('') == ''
 
-- name: Define OTEL Collector version to install
+- name: Defining OTEL Collector version to install
   ansible.builtin.set_fact:
-    collector_version: "{{ remote_version_output.stdout }}"
-  # Apply the same condition to ensure the variable is only overwritten if needed
-  when: collector_version == 'latest' or collector_version | default('') == ''
+    otel_collector_version: "{{ remote_version_output.stdout }}"
+  when: otel_collector_version == 'latest' or otel_collector_version | default('') == ''
 
-- name: Define OTEL Collector version to install
+- name: Defining OTEL Collector Builder URL
   ansible.builtin.set_fact:
-    builder_binary_url: "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/cmd%2Fbuilder%2Fv{{ collector_version }}/ocb_{{ collector_version }}_{{ ansible_system|lower }}_{{ install_arch }}"
+    otel_collector_builder_binary_url: "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/cmd%2Fbuilder%2Fv{{ otel_collector_version }}/ocb_{{ otel_collector_version }}_{{ ansible_system|lower }}_{{ otel_collector_install_arch }}"
 
-- name: Download OTEL Collector Builder
+- name: Downloading OTEL Collector Builder
   ansible.builtin.get_url:
-    url: "{{ builder_binary_url }}"
-    dest: "{{ install_dir }}/tools/ocb"
+    url: "{{ otel_collector_builder_binary_url }}"
+    dest: "{{ otel_collector_tools_folder }}/ocb"
     mode: '0755'
-    owner: otel
-    group: otel
+    owner: "{{ otel_collector_service_user }}"
+    group: "{{ otel_collector_service_group }}"
   become: true
 
-# - name: Install OTEL Collector Builder
-#   ansible.builtin.shell: "{{ builder_install_cmd }}"
-#   environment:
-#     PATH: "{{ ansible_env.PATH }}:{{ install_dir }}/tools/go/bin"
-#     GOCACHE: "{{ install_dir }}/tmp"
-#   register: otelcol_build_res
-#   become: true
-
-- name: Generate otelcol-builder.yaml file
+- name: Generating otelcol-builder.yaml file
   ansible.builtin.template:
     src: otelcol-builder.yaml.j2
-    dest: "{{ install_dir }}/conf/otelcol-builder.yaml"
-    owner: otel
-    group: otel
+    dest: "{{ otel_collector_config_folder }}/otelcol-builder.yaml"
+    owner: "{{ otel_collector_service_user }}"
+    group: "{{ otel_collector_service_group }}"
     mode: '0755'
   become: true
-  register: config_task_res
+  register: builder_config_task_res
 
-- name: Build OTEL Collector
-  ansible.builtin.shell: "{{ install_dir }}/tools/ocb --config {{ install_dir }}/conf/otelcol-builder.yaml"
+- name: Building OTEL Collector
+  ansible.builtin.shell: "{{ otel_collector_tools_folder }}/ocb --config {{ otel_collector_config_folder }}/otelcol-builder.yaml"
   environment:
-    PATH: "{{ ansible_env.PATH }}:{{ install_dir }}/tools/go/bin"
-    GOCACHE: "{{ install_dir }}/tmp"
+    PATH: "{{ ansible_env.PATH }}:{{ otel_collector_tools_folder }}/go/bin"
+    GOCACHE: "{{ otel_collector_tmp_folder }}"
   register: otelcol_build_res
   become: true
   args:
-    creates: "{{ install_dir }}/bin/otelcol"
+    creates: "{{ otel_collector_install_folder }}/bin/otelcol"
 
-- name: Change collector binary ownership
+- name: Changing collector binary ownership
   ansible.builtin.file:
-    path: "{{ install_dir }}/bin/otelcol"
+    path: "{{ otel_collector_install_folder }}/bin/otelcol"
     state: file
-    owner: otel
-    group: otel
+    owner: "{{ otel_collector_service_user }}"
+    group: "{{ otel_collector_service_group }}"
     mode: "0755"
   become: true
 
-- name: Build output
+- name: Building output
   ansible.builtin.debug:
     msg: "{{ otelcol_build_res.stdout_lines }}"
-
-# - name: Building OTEL Collector
-#   shell: "echo $MY_ENV_VARIABLE"
-#   environment:
-#     PATH: "{{ ansible_env.PATH }}:{{ install_dir }}/tools/go/bin"

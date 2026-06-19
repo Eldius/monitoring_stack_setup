@@ -1,0 +1,41 @@
+---
+- name: Validate Monitoring Stack
+  hosts: all
+  tasks:
+    - name: Validate Grafana
+      ansible.builtin.include_role:
+        name: grafana
+        tasks_from: validate.yml
+      when: "'grafana' in group_names"
+
+    - name: Validate Loki
+      ansible.builtin.include_role:
+        name: loki
+        tasks_from: validate.yml
+      when: "'loki' in group_names"
+
+    - name: Validate Alloy
+      ansible.builtin.include_role:
+        name: alloy
+        tasks_from: validate.yml
+      when: "'alloy' in group_names"
+
+    - name: Validate Mimir
+      ansible.builtin.include_role:
+        name: mimir
+        tasks_from: validate.yml
+      when: "'mimir' in group_names"
+
+    - name: Validate Tempo
+      ansible.builtin.include_role:
+        name: tempo
+        tasks_from: validate.yml
+      when: "'tempo' in group_names"
+
+    - name: Validate Prometheus
+      ansible.builtin.include_role:
+        name: prometheus
+        tasks_from: validate.yml
+      when: "'prometheus' in group_names"
+
+    # Add other services as validations are implemented
