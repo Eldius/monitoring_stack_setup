@@ -1,3 +1,5 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # defaults file for health
+healthcheck_retries_count: 25 # Number of retry attempts
+healthcheck_retries_delay: 30 # Delay in seconds between retries

@@ -47,14 +47,14 @@ uninstall-alloy:
 healthcheck-alloy:
 	uv run ansible-playbook -i ./env/local/ playbooks/healthcheck-alloy.yml
 
-install-otelcoll:
-	uv run ansible-playbook -i ./env/local/ playbooks/install-otelcoll.yml
+install-otelcol:
+	uv run ansible-playbook -i ./env/local/ playbooks/install-otelcol.yml
 
-uninstall-otelcoll:
-	uv run ansible-playbook -i ./env/local/ playbooks/uninstall-otelcoll.yml
+uninstall-otelcol:
+	uv run ansible-playbook -i ./env/local/ playbooks/uninstall-otelcol.yml
 
-healthcheck-otelcoll:
-	uv run ansible-playbook -i ./env/local/ playbooks/healthcheck-otelcoll.yml
+healthcheck-otelcol:
+	uv run ansible-playbook -i ./env/local/ playbooks/healthcheck-otelcol.yml
 
 
 

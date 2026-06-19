@@ -97,11 +97,6 @@
   when: config_task_res.changed or env_task_res.changed or servicedef_task_res.changed
   become: true
 
-- name: Checking OTEL Collector service status
-  ansible.builtin.systemd:
-    name: otelcol
-  register: otel_service_status
-  become: true
-
-- debug:
-    msg: "OTEL Collector service is {{ 'running' if otel_service_status.status.ActiveState == 'active' else 'not running' }}"
+- name: Validating installation
+  ansible.builtin.include_tasks: validate.yml
+  tags: validate

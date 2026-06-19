@@ -13,6 +13,11 @@
 - debug:
     msg: "{{ service_name }} service is {{ 'running' if service_status.status.ActiveState == 'active' else 'not running' }}"
 
+#    - name: "Wait for {{ service_name }} to start listening on port 9090"
+#      ansible.builtin.wait_for:
+#        port: 9090
+#        timeout: 30
+
 - name: Verify service healthcheck endpoint is reachable for {{ service_name }}
   ansible.builtin.uri:
     url: "{{ health_endpoint }}"
@@ -21,8 +26,8 @@
     return_content: true
   register: health_check_result
   until: health_check_result.status == 200
-  retries: 10 # Number of retry attempts
-  delay: 5    # Delay in seconds between retries
+  retries: "{{ healthcheck_retries_count }}" # Number of retry attempts
+  delay: "{{ healthcheck_retries_delay }}"    # Delay in seconds between retries
   tags: always
 
 - name: Healthcheck result

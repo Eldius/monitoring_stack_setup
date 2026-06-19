@@ -11,6 +11,11 @@ processors:
   batch:
 
 exporters:
+  otlp/jaeger: # Jaeger supports OTLP directly
+    endpoint: "{{ ansible_default_ipv4.address }}:4317"
+    tls:
+      insecure: true
+      insecure_skip_verify: true
   prometheusremotewrite:
     endpoint: http://{{ ansible_default_ipv4.address }}:9009/api/v1/push
     tls:
@@ -30,7 +35,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tempo]
+      exporters: [otlp/jaeger]
     metrics:
       receivers: [otlp]
       processors: [batch]

@@ -16,7 +16,7 @@
   ansible.builtin.systemd:
     name: otelcol
     enabled: no
-    state: stopped
+    state: absent
   become: true
   ignore_errors: true
 

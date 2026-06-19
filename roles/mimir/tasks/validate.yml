@@ -2,26 +2,12 @@
 ---
 - name: Validate Mimir installation
   block:
-    - name: Verify Mimir service is running
-      ansible.builtin.systemd:
-        name: mimir
-      register: mimir_service_check
-      failed_when: mimir_service_check.status.ActiveState != 'active'
-
-    - name: Wait for Mimir to start listening on port {{ mimir_http_port }}
-      ansible.builtin.wait_for:
-        port: "{{ mimir_http_port }}"
-        timeout: 30
-
-    - name: Verify Mimir health endpoint
-      ansible.builtin.uri:
-        url: "http://localhost:{{ mimir_http_port }}/ready"
-        method: GET
-        status_code: 200
-      register: mimir_health_check
-      until: mimir_health_check.status == 200
-      retries: 5
-      delay: 2
+    - name: Verify service status for Mimir
+      ansible.builtin.include_role:
+        name: health
+      vars:
+        service_name: mimir
+        health_endpoint: "http://localhost:{{ mimir_http_port }}/ready"
 
     - name: Check Mimir configuration file exists
       ansible.builtin.stat:

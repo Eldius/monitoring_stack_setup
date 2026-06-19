@@ -2,26 +2,33 @@
 ---
 - name: Validate Tempo installation
   block:
-    - name: Verify Tempo service is running
-      ansible.builtin.systemd:
-        name: tempo
-      register: tempo_service_check
-      failed_when: tempo_service_check.status.ActiveState != 'active'
+#    - name: Verify Tempo service is running
+#      ansible.builtin.systemd:
+#        name: tempo
+#      register: tempo_service_check
+#      failed_when: tempo_service_check.status.ActiveState != 'active'
+#
+#    - name: Wait for Tempo to start listening on port {{ tempo_http_listen_port }}
+#      ansible.builtin.wait_for:
+#        port: "{{ tempo_http_listen_port }}"
+#        timeout: 30
+#
+#    - name: Verify Tempo health endpoint
+#      ansible.builtin.uri:
+#        url: "http://localhost:{{ tempo_http_listen_port }}/ready"
+#        method: GET
+#        status_code: 200
+#      register: tempo_health_check
+#      until: tempo_health_check.status == 200
+#      retries: 5
+#      delay: 2
 
-    - name: Wait for Tempo to start listening on port {{ tempo_http_listen_port }}
-      ansible.builtin.wait_for:
-        port: "{{ tempo_http_listen_port }}"
-        timeout: 30
-
-    - name: Verify Tempo health endpoint
-      ansible.builtin.uri:
-        url: "http://localhost:{{ tempo_http_listen_port }}/ready"
-        method: GET
-        status_code: 200
-      register: tempo_health_check
-      until: tempo_health_check.status == 200
-      retries: 5
-      delay: 2
+    - name: Verify service status for Tempo
+      ansible.builtin.include_role:
+        name: health
+      vars:
+        service_name: tempo
+        health_endpoint: "http://localhost:{{ tempo_http_listen_port }}/ready"
 
     - name: Check Tempo configuration file exists
       ansible.builtin.stat:
@@ -31,7 +38,7 @@
 
     - name: Verify Tempo binary exists
       ansible.builtin.stat:
-        path: "{{ tempo_install_folder }}/tempo-{{ ansible_facts['system'] | lower }}-{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else ansible_facts['architecture'] | lower }}"
+        path: "{{ tempo_install_folder }}/tempo"
       register: tempo_binary_stat
       failed_when: not tempo_binary_stat.stat.exists
   become: true

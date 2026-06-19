@@ -2,26 +2,33 @@
 ---
 - name: Validate Loki installation
   block:
-    - name: Verify Loki service is running
-      ansible.builtin.systemd:
-        name: loki
-      register: loki_service_check
-      failed_when: loki_service_check.status.ActiveState != 'active'
+#    - name: Verify Loki service is running
+#      ansible.builtin.systemd:
+#        name: loki
+#      register: loki_service_check
+#      failed_when: loki_service_check.status.ActiveState != 'active'
+#
+#    - name: Wait for Loki to start listening on port {{ loki_http_listen_port }}
+#      ansible.builtin.wait_for:
+#        port: "{{ loki_http_listen_port }}"
+#        timeout: 30
+#
+#    - name: Verify Loki health endpoint
+#      ansible.builtin.uri:
+#        url: "http://localhost:{{ loki_http_listen_port }}/ready"
+#        method: GET
+#        status_code: 200
+#      register: loki_health_check
+#      until: loki_health_check.status == 200
+#      retries: 5
+#      delay: 2
 
-    - name: Wait for Loki to start listening on port {{ loki_http_listen_port }}
-      ansible.builtin.wait_for:
-        port: "{{ loki_http_listen_port }}"
-        timeout: 30
-
-    - name: Verify Loki health endpoint
-      ansible.builtin.uri:
-        url: "http://localhost:{{ loki_http_listen_port }}/ready"
-        method: GET
-        status_code: 200
-      register: loki_health_check
-      until: loki_health_check.status == 200
-      retries: 5
-      delay: 2
+    - name: Verify service status for Loki
+      ansible.builtin.include_role:
+        name: health
+      vars:
+        service_name: loki
+        health_endpoint: "http://localhost:{{ loki_http_listen_port }}/ready"
 
     - name: Check Loki configuration file exists
       ansible.builtin.stat:

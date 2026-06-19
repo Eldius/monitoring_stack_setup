@@ -3,5 +3,5 @@
   hosts: otel_collector
   roles:
     - role: eldius.monitoring_stack_setup.health
-      service_name: otelcoll
-      health_endpoint: "http://localhost:12345/-/health"
+      service_name: otelcol
+      health_endpoint: "http://localhost:13133/health/status"

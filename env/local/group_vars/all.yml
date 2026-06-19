@@ -12,12 +12,15 @@
 # Set to "alloy" (default) or "otel_collector" to choose which collector
 # is deployed by the "all" playbooks.
 # telemetry_collector: alloy
+telemetry_collector: otel_collector
 
 # ---------------------------------------------------------------------------
 # base — Shared infrastructure
 # ---------------------------------------------------------------------------
 # base_install_folder: /usr/local/monitoring
 # base_data_folder: /var/lib/monitoring
+base_install_folder: /usr/local/monitoring
+base_data_folder: /var/lib/monitoring
 
 # ---------------------------------------------------------------------------
 # alloy — Grafana Alloy collector
