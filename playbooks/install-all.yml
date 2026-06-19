@@ -8,4 +8,7 @@
     - eldius.monitoring_stack_setup.tempo
     - eldius.monitoring_stack_setup.prometheus
     - eldius.monitoring_stack_setup.grafana
-    - eldius.monitoring_stack_setup.alloy
+    - role: eldius.monitoring_stack_setup.alloy
+      when: telemetry_collector | default('alloy') == 'alloy'
+    - role: eldius.monitoring_stack_setup.otel_collector
+      when: telemetry_collector | default('alloy') == 'otel_collector'

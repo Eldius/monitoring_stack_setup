@@ -38,4 +38,8 @@
         tasks_from: validate.yml
       when: "'prometheus' in group_names"
 
-    # Add other services as validations are implemented
+    - name: Validate OTEL Collector
+      ansible.builtin.include_role:
+        name: otel_collector
+        tasks_from: validate.yml
+      when: "'otel_collector' in group_names"

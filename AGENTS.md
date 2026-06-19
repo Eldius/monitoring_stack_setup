@@ -1,72 +1,60 @@
-# Project Overview: Monitoring Stack Setup
+# Repository Guidelines
 
-This project is an Ansible collection designed to automate the installation, configuration, and management of a comprehensive monitoring stack. It supports several components from the Grafana ecosystem, Prometheus, and OpenTelemetry.
+## Project Structure & Module Organization
 
-## Main Technologies
-- **Ansible**: Core automation tool for deployment and configuration.
-- **Python (uv)**: Used for managing dependencies and running Ansible.
-- **Monitoring Components**:
-  - **Grafana**: For visualization and dashboards.
-  - **Prometheus**: For metrics collection.
-  - **Loki**: For log aggregation.
-  - **Tempo**: For distributed tracing.
-  - **Mimir**: For long-term metrics storage.
-  - **Alloy**: Grafana's OpenTelemetry-compatible collector.
-  - **OpenTelemetry Collector**: Vendor-agnostic proxy to receive, process, and export telemetry data.
+```
+├── roles/            # Ansible roles for each monitoring component
+│   ├── base/         # Shared infrastructure (directories, groups)
+│   ├── alloy/        # Grafana Alloy collector
+│   ├── grafana/      # Grafana visualization
+│   ├── health/       # Reusable health-check role
+│   ├── loki/         # Log aggregation
+│   ├── mimir/        # Long-term metrics storage
+│   ├── otel_collector/  # OpenTelemetry Collector (built from source)
+│   ├── prometheus/   # Metrics collection
+│   └── tempo/        # Distributed tracing
+├── playbooks/        # Install, uninstall, healthcheck, and validate playbooks
+├── env/local/        # Inventory files for local/targeted deployments
+├── scripts/          # Utility scripts (e.g., hosts_fetch.py)
+├── meta/             # Ansible collection metadata
+├── Makefile          # Task runner (wraps uv run ansible-*)
+├── pyproject.toml    # Python project config (uv-based)
+└── galaxy.yml        # Ansible Galaxy collection manifest
+```
 
-## Architecture and Structure
-The project follows a standard Ansible collection structure:
-- **`roles/`**: Contains the logic for each service.
-  - `base`: Sets up shared directories (`/usr/local/monitoring` for binaries, `/var/lib/monitoring` for data), creates common groups, and ensures prerequisites.
-  - `alloy`, `grafana`, `loki`, `mimir`, `prometheus`, `tempo`, `otel_collector`: Specific roles for each tool.
-- **`playbooks/`**: Entry point for various operations (install, uninstall, healthcheck).
-- **`env/local/hosts.yml`**: Default inventory for local/targeted deployments.
-- **`scripts/`**: Utility scripts, such as `hosts_fetch.py` for dynamic host discovery.
-- **`Makefile`**: Provides a convenient interface for common tasks.
+Each role follows a consistent lifecycle: prerequisites → user/group setup → directories → binary mgmt → Jinja2 config → systemd unit.
 
-## Building and Running
+## Build, Test, and Development Commands
 
-### Prerequisites
-- Python 3.12+
-- `uv` (Fast Python package installer and resolver)
-- `make`
-
-### Common Commands
-All commands are prefixed with `uv run` via the `Makefile`.
+Commands wrap `uv run ansible-*` via `make`:
 
 | Command | Description |
 | :--- | :--- |
-| `make init` | Installs the collection locally and prepares the environment. |
-| `make install-all` | Deploys the entire monitoring stack. |
-| `make install-<service>` | Deploys a specific service (e.g., `make install-grafana`, `make install-otelcoll`). |
-| `make uninstall-all` | Removes all components from the target hosts. |
-| `make healthcheck-all` | Runs health checks for all components. |
-| `make hosts` | Fetches/updates host information using `scripts/hosts_fetch.py`. |
+| `make init` | Install the collection locally via `ansible-galaxy` |
+| `make install-<service>` | Deploy a single service (e.g., `install-grafana`, `install-otelcoll`) |
+| `make uninstall-<service>` | Remove a single service |
+| `make healthcheck-<service>` | Run health check for a single service |
+| `make install-all` | Deploy the full monitoring stack |
+| `make uninstall-all` | Remove all components |
+| `make healthcheck-all` | Health-check all deployed services |
+| `make hosts` | Discover and update inventory via `scripts/hosts_fetch.py` |
 
-## Development Conventions
+To run a playbook directly: `uv run ansible-playbook -i ./env/local/ playbooks/<playbook>.yml`
 
-### Role Pattern
-Each role follows a consistent pattern to ensure maintainability:
-1. **Prerequisites**: Check for necessary system tools or dependencies.
-2. **User/Group**: Create dedicated system users/groups for the service (e.g., `grafana` user).
-3. **Directories**: Create necessary folders for binaries, configuration, and data.
-4. **Binary Management**: Download or build (e.g., `otel_collector`) binaries and place them in the installation folder.
-5. **Configuration**: Use Jinja2 templates (`templates/`) to generate configuration files.
-6. **Systemd**: Deploy and enable a systemd unit file (`templates/*.service.j2`).
+## Coding Style & Naming Conventions
 
-### Shared Infrastructure (`base` role)
-The `base` role provides a foundation for other roles. It defines:
-- `base_install_folder`: `/usr/local/monitoring`
-- `base_data_folder`: `/var/lib/monitoring`
-- Common system groups and basic packages.
+- **YAML/Ansible**: 2-space indentation. Use fully qualified collection names (FQCNs) for modules and roles (e.g., `eldius.monitoring_stack_setup.health`).
+- **Python scripts**: Follow PEP 8. Managed via `uv`.
+- **Jinja2 templates**: Use `.j2` extension. Template variables use `snake_case`.
+- **Playbooks**: Lowercase with hyphen-separated words (e.g., `install-otelcoll.yml`).
 
-### Adding a New Service
-1. Create a new role in `roles/` following the existing pattern.
-2. Consider adding `base` as a dependency if it shares the common infrastructure.
-3. Create install, uninstall, and healthcheck playbooks in `playbooks/`.
-4. Update the `Makefile` with corresponding targets.
-5. Update `playbooks/install-all.yml` and `playbooks/uninstall-all.yml` to include the new service.
+## Testing Guidelines
 
-### Testing
-- Use `playbooks/healthcheck-<service>.yml` to verify the deployment.
-- Role-specific tests are located in `roles/<service>/tests/`.
+- **Health checks**: Use `playbooks/healthcheck-<service>.yml` to verify each deployment via HTTP endpoints (e.g., `localhost:3000/api/health` for Grafana).
+- **Validation**: Run `playbooks/validate-all.yml` to validate all services across groups.
+- **Role tests**: Located under `roles/<service>/tests/test.yml`. Use `ansible-test` for role-level validation.
+
+## Commit & Pull Request Guidelines
+
+- **Commit messages**: Descriptive, present-tense summaries. No strict convention; focus on clarity.
+- **Pull requests**: Describe changes, reference related issues, and ensure `make install-all` and `make healthcheck-all` pass on the target inventory.

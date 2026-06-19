@@ -1,0 +1,133 @@
+---
+# =============================================================================
+# Monitoring Stack Setup — Local Environment Variables
+# =============================================================================
+# This file aggregates all role variables with their default values.
+# Uncomment and modify to override defaults for your deployment.
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Global — Telemetry collector selection
+# ---------------------------------------------------------------------------
+# Set to "alloy" (default) or "otel_collector" to choose which collector
+# is deployed by the "all" playbooks.
+# telemetry_collector: alloy
+
+# ---------------------------------------------------------------------------
+# base — Shared infrastructure
+# ---------------------------------------------------------------------------
+# base_install_folder: /usr/local/monitoring
+# base_data_folder: /var/lib/monitoring
+
+# ---------------------------------------------------------------------------
+# alloy — Grafana Alloy collector
+# ---------------------------------------------------------------------------
+# alloy_version: 1.12.1
+# alloy_install_folder: "{{ base_install_folder }}/alloy"
+# alloy_data_folder: "{{ base_data_folder }}/alloy"
+# alloy_config_folder: "{{ alloy_install_folder }}/config"
+# alloy_otlp_grpc_ingest_port: 4317
+# alloy_otlp_http_ingest_port: 4318
+# alloy_http_listen_port: 12345
+# alloy_service_group: alloy
+# alloy_service_user: alloy
+# alloy_loki_host: "http://localhost:3100"
+# alloy_loki_push_url: "{{ alloy_loki_host }}/loki/api/v1/push"
+# alloy_prometheus_host: "http://localhost:9009"
+# alloy_prometheus_remote_write_url: "{{ alloy_prometheus_host }}/api/v1/push"
+# alloy_tempo_otlp_endpoint: "localhost:4319"
+
+# ---------------------------------------------------------------------------
+# grafana — Visualization and dashboards
+# ---------------------------------------------------------------------------
+# grafana_version: 12.3.1
+# grafana_service_user: grafana
+# grafana_service_group: grafana
+# grafana_install_folder: "{{ base_install_folder }}/grafana"
+# grafana_data_folder: "{{ base_data_folder }}/grafana"
+# grafana_config_folder: "{{ grafana_install_folder }}/conf"
+# grafana_logs_folder: "{{ base_data_folder }}/logs"
+
+# ---------------------------------------------------------------------------
+# loki — Log aggregation
+# ---------------------------------------------------------------------------
+# loki_version: 3.6.3
+# loki_install_folder: "{{ base_install_folder }}/loki"
+# loki_data_folder: "{{ base_data_folder }}/loki"
+# loki_config_folder: "{{ loki_install_folder }}/config"
+# loki_service_group: loki
+# loki_service_user: loki
+# loki_log_level: info
+# loki_common_path_prefix: "{{ loki_data_folder }}/tmp/loki/common"
+# loki_common_storage_chunks_directory: "{{ loki_data_folder }}/tmp/loki/chunks"
+# loki_storage_config_directory: "{{ loki_data_folder }}/tmp/loki/chunks"
+# loki_rules_storage_directory: "{{ loki_data_folder }}/tmp/loki/rules"
+# loki_http_listen_port: 3100
+# loki_grpc_listen_port: 9096
+# loki_limits_retention_period: 48h
+# loki_compactor_working_directory: "{{ loki_data_folder }}/tmp/loki/compactor"
+
+# ---------------------------------------------------------------------------
+# mimir — Long-term metrics storage
+# ---------------------------------------------------------------------------
+# mimir_install_folder: "{{ base_install_folder }}/mimir"
+# mimir_config_folder: "{{ base_install_folder }}/mimir/config"
+# mimir_data_folder: "{{ base_data_folder }}/mimir"
+# mimir_service_group: mimir
+# mimir_service_user: mimir
+# mimir_http_port: 9009
+# mimir_grpc_port: 9005
+# mimir_log_level: info
+# mimir_storage_bucket_store_dir: "{{ mimir_data_folder }}/tsdb-sync"
+# mimir_storage_filesystem_dir: "{{ mimir_data_folder }}/fs/tsdb"
+# mimir_storage_tsdb_dir: "{{ mimir_data_folder }}/tmp/tsdb"
+# mimir_compactor_data_dir: "{{ mimir_data_folder }}/tmp/compactor"
+# mimir_ruler_storage_dir: "{{ mimir_data_folder }}/tmp/rules"
+# mimir_storage_tsdb_retention_period: 48h
+# mimir_compactor_retention_interval: 2h
+
+# ---------------------------------------------------------------------------
+# otel_collector — OpenTelemetry Collector (built from source)
+# ---------------------------------------------------------------------------
+# otel_collector_version: 0.127.0
+# otel_collector_go_version: 1.26.3
+# otel_collector_service_user: otel
+# otel_collector_service_group: otel
+# otel_collector_install_folder: "{{ base_install_folder }}/otel"
+# otel_collector_data_folder: "{{ base_data_folder }}/otel"
+# otel_collector_config_folder: "{{ otel_collector_install_folder }}/conf"
+# otel_collector_tools_folder: "{{ otel_collector_install_folder }}/tools"
+# otel_collector_tmp_folder: "{{ otel_collector_install_folder }}/tmp"
+# otel_collector_fluentforward_receiver_enabled: true
+# otel_collector_otlptraces_receiver_enabled: true
+# otel_collector_otlpmetrics_receiver_enabled: true
+# otel_collector_loki_exporter_enabled: true
+# otel_collector_tempo_exporter_enabled: true
+# otel_collector_jaeger_exporter_enabled: true
+# otel_collector_prometheus_remotewrite_enabled: true
+# otel_collector_victoriametrics_exporter_enabled: true
+
+# ---------------------------------------------------------------------------
+# prometheus — Metrics collection
+# ---------------------------------------------------------------------------
+# prometheus_version: 3.9.1
+# prometheus_service_user: prometheus
+# prometheus_service_group: prometheus
+# prometheus_install_folder: "{{ base_install_folder }}/prometheus"
+# prometheus_data_folder: "{{ base_data_folder }}/prometheus"
+# prometheus_logs_folder: "{{ base_data_folder }}/logs"
+
+# ---------------------------------------------------------------------------
+# tempo — Distributed tracing
+# ---------------------------------------------------------------------------
+# tempo_version: 2.9.0
+# tempo_service_user: tempo
+# tempo_service_group: tempo
+# tempo_install_folder: "{{ base_install_folder }}/tempo"
+# tempo_data_folder: "{{ base_data_folder }}/tempo"
+# tempo_config_folder: "{{ tempo_install_folder }}/config"
+# tempo_http_listen_port: 3200
+# tempo_grpc_listen_port: 9095
+# tempo_receiver_grpc_listen_port: 4319
+# tempo_receiver_http_listen_port: 4320
+# tempo_compactor_block_retention: 48h

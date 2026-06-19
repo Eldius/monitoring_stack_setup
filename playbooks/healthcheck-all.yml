@@ -6,6 +6,12 @@
       role: eldius.monitoring_stack_setup.health
       service_name: alloy
       health_endpoint: "http://localhost:12345/-/health"
+      when: telemetry_collector | default('alloy') == 'alloy'
+    - name: Checking OTEL Collector
+      role: eldius.monitoring_stack_setup.health
+      service_name: otelcoll
+      health_endpoint: "http://localhost:12345/-/health"
+      when: telemetry_collector | default('alloy') == 'otel_collector'
     - name: Checking Grafana
       role: eldius.monitoring_stack_setup.health
       service_name: grafana
